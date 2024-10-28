@@ -34,6 +34,18 @@ export class CommonModule implements NestModule{
       {
         path: '/api/v1/users/update',
         method: RequestMethod.PUT,
+      },
+      {
+        path: '/api/v1/technologies',
+        method: RequestMethod.POST,
+      },
+      {
+        path: '/api/v1/technologies',
+        method: RequestMethod.PUT,
+      },
+      {
+        path: '/api/v1/technologies/*',
+        method: RequestMethod.DELETE,
       }
     )
   }
