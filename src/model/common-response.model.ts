@@ -10,4 +10,5 @@ export class Paging {
   size: number;
   totalPage: number;
   currentPage: number;
+  totalRows: number;
 }

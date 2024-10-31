@@ -119,6 +119,28 @@ export class TechnologyService {
     };
   }
 
+  async getByName(name: string): Promise<TechResponse> {
+    this.logger.debug(`Getting technology ${name}`);
+
+    const technology = await this.prismaService.technology.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: 'insensitive'
+        }
+      }
+    });
+
+    if (!technology) {
+      throw new HttpException('Technology not found', 404);
+    }
+
+    return {
+      id: technology.id,
+      name: technology.name
+    };
+  }
+
   async list(): Promise<TechResponse[]> {
     this.logger.debug(`Listing technologies`);
 

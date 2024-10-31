@@ -8,6 +8,8 @@ import { ErrorFilter } from "./error.filter";
 import { APP_FILTER } from "@nestjs/core";
 import { AuthMiddleware } from "./auth.middleware";
 import { JwtAuthModule } from "../jwt/jwt.module";
+import { CloudinaryService } from "./cloudinary.service";
+import { CloudinaryProvider } from "./cloudinary.provider";
 
 @Global()
 @Module({
@@ -20,13 +22,13 @@ import { JwtAuthModule } from "../jwt/jwt.module";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    JwtAuthModule
+    JwtAuthModule,
   ],
-  providers: [PrismaService, ValidationService, {
+  providers: [PrismaService, ValidationService, CloudinaryProvider, CloudinaryService, {
     provide: APP_FILTER,
     useClass: ErrorFilter,
   }],
-  exports: [PrismaService, ValidationService],
+  exports: [PrismaService, ValidationService, CloudinaryProvider, CloudinaryService],
 })
 export class CommonModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
@@ -37,16 +39,16 @@ export class CommonModule implements NestModule{
       },
       {
         path: '/api/v1/technologies',
-        method: RequestMethod.POST,
-      },
-      {
-        path: '/api/v1/technologies',
-        method: RequestMethod.PUT,
+        method: RequestMethod.POST || RequestMethod.PUT,
       },
       {
         path: '/api/v1/technologies/*',
         method: RequestMethod.DELETE,
-      }
+      },
+      {
+        path: '/api/v1/projects',
+        method: RequestMethod.POST || RequestMethod.PUT,
+      },
     )
   }
 }

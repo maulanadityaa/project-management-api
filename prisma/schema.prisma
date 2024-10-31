@@ -21,6 +21,8 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  projects Project[]
+
   @@map("mst_user")
 }
 
@@ -30,10 +32,12 @@ model Project {
   description String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+  user_id     String
 
   technologies       Technology[]        @relation("ProjectTechnology")
   project_technology ProjectTechnology[]
   project_image      ProjectImage[]
+  user               User                @relation(fields: [user_id], references: [id])
 
   @@map("mst_project")
 }

@@ -4,6 +4,7 @@ import { TechnologyController } from './technology.controller';
 
 @Module({
   providers: [TechnologyService],
-  controllers: [TechnologyController]
+  controllers: [TechnologyController],
+  exports: [TechnologyService],
 })
 export class TechnologyModule {}
