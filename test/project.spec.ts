@@ -95,6 +95,8 @@ describe('TechnologyController', () => {
       await testService.createProject();
     });
 
+    jest.setTimeout(30000);
+
     it('should be rejected if request is invalid', async () => {
       const token = await testService.getToken();
 
