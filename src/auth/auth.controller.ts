@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Put } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, Put } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginRequest, LoginResponse, RegisterRequest, UserResponse, UserUpdateRequest } from "../model/auth.model";
 import { CommonResponse } from "../model/common-response.model";
@@ -22,6 +22,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(
     @Body() request: LoginRequest
   ): Promise<CommonResponse<LoginResponse>> {
@@ -35,6 +36,7 @@ export class AuthController {
   }
 
   @Put('update')
+  @HttpCode(HttpStatus.OK)
   async update(
     @Auth() token: string,
     @Body() request: UserUpdateRequest

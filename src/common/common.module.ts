@@ -39,7 +39,11 @@ export class CommonModule implements NestModule{
       },
       {
         path: '/api/v1/technologies',
-        method: RequestMethod.POST || RequestMethod.PUT,
+        method: RequestMethod.POST,
+      },
+      {
+        path: '/api/v1/technologies',
+        method: RequestMethod.PUT,
       },
       {
         path: '/api/v1/technologies/*',
@@ -47,8 +51,12 @@ export class CommonModule implements NestModule{
       },
       {
         path: '/api/v1/projects',
-        method: RequestMethod.POST || RequestMethod.PUT,
+        method: RequestMethod.POST,
       },
+      {
+        path: '/api/v1/projects',
+        method: RequestMethod.PUT,
+      }
     )
   }
 }

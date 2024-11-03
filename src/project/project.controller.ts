@@ -24,7 +24,7 @@ export class ProjectController {
   @UseInterceptors(FileInterceptor('image', {
     storage: memoryStorage(),
     limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB
+      fileSize: 5 * 1024 * 1024,
     },
   }))
   async create(
@@ -45,7 +45,6 @@ export class ProjectController {
       hasBuffer: !!image?.buffer
     });
 
-    // Don't spread the file object or modify it
     const projectData: ProjectRequest = {
       name: request.name,
       description: request.description,
@@ -69,7 +68,7 @@ export class ProjectController {
   @UseInterceptors(FileInterceptor('image', {
     storage: memoryStorage(),
     limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB
+      fileSize: 5 * 1024 * 1024,
     },
   }))
   async update(
@@ -126,8 +125,8 @@ export class ProjectController {
     const request: ProjectSearchRequest = {
       name: name,
       techs: techs,
-      page: page || 1,
-      size: size || 10,
+      page: parseInt(String(page)) || 1,
+      size: parseInt(String(size)) || 10,
     }
 
     return await this.projectService.search(request);
