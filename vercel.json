@@ -16,10 +16,5 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "functions": {
-    "api/*.js": {
-      "includeFiles": ["prisma/schema.prisma"],
-      "buildCommand": "prisma generate && npm run build"
-    }
-  }
+  "buildCommand": "prisma generate && npm run build"
 }
