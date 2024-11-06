@@ -19,7 +19,6 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "buildCommand": "prisma generate && npm run build",
   "functions": {
     "api/v1/projects": {
       "maxDuration": 60
