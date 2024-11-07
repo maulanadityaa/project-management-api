@@ -2,19 +2,20 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpCode,
   HttpStatus,
   Param,
   Post,
   Put,
   UploadedFile,
-  UseInterceptors
-} from "@nestjs/common";
+  UseInterceptors,
+} from '@nestjs/common';
 import { TechnologyService } from "./technology.service";
 import { TechRequest, TechResponse, TechUpdateRequest } from "../model/technology.model";
 import { CommonResponse } from "../model/common-response.model";
 import { CloudinaryService } from "../common/cloudinary.service";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('/api/v1/technologies')
 export class TechnologyController {
@@ -22,6 +23,8 @@ export class TechnologyController {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new technology' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Technology created', type: TechResponse })
   async create(@Body() request: TechRequest): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.create(request);
 
@@ -33,6 +36,9 @@ export class TechnologyController {
   }
 
   @Put()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update a technology' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Technology updated', type: TechResponse })
   async update(@Body() request: TechUpdateRequest): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.update(request);
 
@@ -44,6 +50,9 @@ export class TechnologyController {
   }
 
   @Get('/:techId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get a technology' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Technology retrieved', type: TechResponse })
   async get(@Param('techId') techId: string): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.get(techId);
 
@@ -55,6 +64,9 @@ export class TechnologyController {
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'List all technologies' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Technologies retrieved', type: TechResponse, isArray: true })
   async list(): Promise<CommonResponse<TechResponse[]>> {
     const result = await this.technologyService.list();
 
@@ -66,6 +78,9 @@ export class TechnologyController {
   }
 
   @Delete('/:techId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete a technology' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Technology deleted', type: Boolean })
   async delete(@Param('techId') techId: string): Promise<CommonResponse<boolean>> {
     await this.technologyService.delete(techId);
 
@@ -73,19 +88,6 @@ export class TechnologyController {
       statusCode: HttpStatus.OK,
       message: 'Technology deleted',
       data: true
-    }
-  }
-
-  @Post('/upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file: Express.Multer.File): Promise<CommonResponse<string>> {
-    console.log(file);
-    const result = await this.cloudinaryService.uploadImage(file);
-
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Image uploaded',
-      data: result.secure_url
     }
   }
 }
