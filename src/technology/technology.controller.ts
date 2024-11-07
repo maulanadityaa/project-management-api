@@ -15,7 +15,7 @@ import { TechRequest, TechResponse, TechUpdateRequest } from "../model/technolog
 import { CommonResponse } from "../model/common-response.model";
 import { CloudinaryService } from "../common/cloudinary.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 @Controller('/api/v1/technologies')
 export class TechnologyController {
@@ -25,6 +25,7 @@ export class TechnologyController {
   @Post()
   @ApiOperation({ summary: 'Create a new technology' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Technology created', type: TechResponse })
+  @ApiBody({ type: TechRequest })
   async create(@Body() request: TechRequest): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.create(request);
 
@@ -39,6 +40,7 @@ export class TechnologyController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a technology' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Technology updated', type: TechResponse })
+  @ApiBody({ type: TechUpdateRequest })
   async update(@Body() request: TechUpdateRequest): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.update(request);
 
@@ -53,6 +55,7 @@ export class TechnologyController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a technology' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Technology retrieved', type: TechResponse })
+  @ApiParam({ name: 'techId', type: String, example: 'ValidUUIDv4' })
   async get(@Param('techId') techId: string): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.get(techId);
 
@@ -81,6 +84,7 @@ export class TechnologyController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a technology' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Technology deleted', type: Boolean })
+  @ApiParam({ name: 'techId', type: String, example: 'ValidUUIDv4' })
   async delete(@Param('techId') techId: string): Promise<CommonResponse<boolean>> {
     await this.technologyService.delete(techId);
 

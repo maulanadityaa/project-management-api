@@ -25,7 +25,7 @@ import {
 import { CommonResponse } from '../model/common-response.model';
 import { memoryStorage } from 'multer';
 import { Auth } from '../common/auth.decorator';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 @Controller('/api/v1/projects')
 export class ProjectController {
@@ -92,7 +92,7 @@ export class ProjectController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Project updated' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    type: ProjectRequest
+    type: ProjectUpdateRequest
   })
   async update(
     @Auth() token: string,
@@ -131,6 +131,7 @@ export class ProjectController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a project' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Project found' })
+  @ApiParam({ name: 'projectId', description: 'Project ID', example: 'ValidUUIDv4' })
   async get(
     @Param('projectId') projectId: string,
   ): Promise<CommonResponse<ProjectResponse>> {
@@ -147,6 +148,10 @@ export class ProjectController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Search projects' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Projects found' })
+  @ApiParam({ name: 'name', description: 'Project Name', example: 'Project Name', required: false })
+  @ApiParam({ name: 'techs', description: 'Array of technologies', example: ['tech1', 'tech2'], required: false })
+  @ApiParam({ name: 'page', description: 'Page number (optional) - default 1', example: 1, required: false })
+  @ApiParam({ name: 'size', description: 'Page size (optional) - default 10', example: 10, required: false })
   async search(
     @Query('name') name?: string,
     @Query('techs') techs?: string[],
