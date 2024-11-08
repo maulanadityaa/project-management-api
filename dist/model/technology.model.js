@@ -26,7 +26,10 @@ __decorate([
     __metadata("design:type", String)
 ], TechUpdateRequest.prototype, "id", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Updated Technology Name', description: 'Technology Name (optional)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'Updated Technology Name',
+        description: 'Technology Name (optional)',
+    }),
     __metadata("design:type", String)
 ], TechUpdateRequest.prototype, "name", void 0);
 class TechResponse {

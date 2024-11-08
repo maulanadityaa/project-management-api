@@ -1,18 +1,22 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { PrismaService } from "../common/prisma.service";
-import { ValidationService } from "../common/validation.service";
-import { Logger } from "winston";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { TechRequest, TechResponse, TechUpdateRequest } from "../model/technology.model";
-import { TechnologyValidation } from "./technology.validation";
-import { Technology } from "@prisma/client";
+import { HttpException, Inject, Injectable } from '@nestjs/common';
+import { PrismaService } from '../common/prisma.service';
+import { ValidationService } from '../common/validation.service';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import {
+  TechRequest,
+  TechResponse,
+  TechUpdateRequest,
+} from '../model/technology.model';
+import { TechnologyValidation } from './technology.validation';
+import { Technology } from '@prisma/client';
 
 @Injectable()
 export class TechnologyService {
   constructor(
     private prismaService: PrismaService,
     private validationService: ValidationService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
 
   async checkTechExists(techName: string): Promise<Technology> {
@@ -20,9 +24,9 @@ export class TechnologyService {
       where: {
         name: {
           equals: techName,
-          mode: 'insensitive'
-        }
-      }
+          mode: 'insensitive',
+        },
+      },
     });
 
     if (tech) {
@@ -35,8 +39,8 @@ export class TechnologyService {
   async checkTechMustExists(techId: string): Promise<Technology> {
     const tech = await this.prismaService.technology.findUnique({
       where: {
-        id: techId
-      }
+        id: techId,
+      },
     });
 
     if (!tech) {
@@ -51,44 +55,42 @@ export class TechnologyService {
 
     const techRequest: TechRequest = this.validationService.validate(
       TechnologyValidation.CREATE,
-      request
+      request,
     );
 
     let technology = await this.checkTechExists(techRequest.name);
 
     technology = await this.prismaService.technology.create({
-      data: techRequest
+      data: techRequest,
     });
 
     return {
       id: technology.id,
-      name: technology.name
+      name: technology.name,
     };
   }
 
   async update(request: TechUpdateRequest): Promise<TechResponse> {
     this.logger.debug(`Updating technology ${JSON.stringify(request)}`);
 
-    const techUpdateRequest: TechUpdateRequest = this.validationService.validate(
-      TechnologyValidation.UPDATE,
-      request
-    );
+    const techUpdateRequest: TechUpdateRequest =
+      this.validationService.validate(TechnologyValidation.UPDATE, request);
 
     let technology = await this.checkTechMustExists(techUpdateRequest.id);
 
     technology = await this.prismaService.technology.update({
       where: {
-        id: techUpdateRequest.id
+        id: techUpdateRequest.id,
       },
       data: {
-        name: techUpdateRequest.name
-      }
+        name: techUpdateRequest.name,
+      },
     });
 
     return {
       id: technology.id,
-      name: technology.name
-    }
+      name: technology.name,
+    };
   }
 
   async delete(id: string): Promise<TechResponse> {
@@ -98,13 +100,13 @@ export class TechnologyService {
 
     technology = await this.prismaService.technology.delete({
       where: {
-        id
-      }
+        id,
+      },
     });
 
     return {
       id: technology.id,
-      name: technology.name
+      name: technology.name,
     };
   }
 
@@ -115,7 +117,7 @@ export class TechnologyService {
 
     return {
       id: technology.id,
-      name: technology.name
+      name: technology.name,
     };
   }
 
@@ -126,9 +128,9 @@ export class TechnologyService {
       where: {
         name: {
           equals: name,
-          mode: 'insensitive'
-        }
-      }
+          mode: 'insensitive',
+        },
+      },
     });
 
     if (!technology) {
@@ -137,7 +139,7 @@ export class TechnologyService {
 
     return {
       id: technology.id,
-      name: technology.name
+      name: technology.name,
     };
   }
 
@@ -146,9 +148,9 @@ export class TechnologyService {
 
     const technologies = await this.prismaService.technology.findMany();
 
-    return technologies.map(technology => ({
+    return technologies.map((technology) => ({
       id: technology.id,
-      name: technology.name
+      name: technology.name,
     }));
   }
 }

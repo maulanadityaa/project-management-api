@@ -100,7 +100,6 @@ export class AuthService {
     );
 
     const decodedUser = await this.jwtService.verifyToken(token);
-    console.log(decodedUser);
 
     const user = await this.prismaService.user.findUnique({
       where: {

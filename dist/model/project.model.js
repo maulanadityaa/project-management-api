@@ -62,7 +62,7 @@ __decorate([
     __metadata("design:type", String)
 ], ProjectSearchRequest.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: ['tech1', 'tech2'], description: 'Array of technologies', type: 'array', items: { type: 'string' } }),
+    (0, swagger_1.ApiPropertyOptional)({ example: ['tech1', 'tech2'], description: 'Array of technologies (optional)', type: 'array', items: { type: 'string' } }),
     __metadata("design:type", Object)
 ], ProjectSearchRequest.prototype, "techs", void 0);
 __decorate([

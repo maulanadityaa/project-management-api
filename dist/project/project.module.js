@@ -19,7 +19,7 @@ exports.ProjectModule = ProjectModule = __decorate([
     (0, common_1.Module)({
         imports: [technology_module_1.TechnologyModule, jwt_module_1.JwtAuthModule],
         providers: [project_service_1.ProjectService],
-        controllers: [project_controller_1.ProjectController]
+        controllers: [project_controller_1.ProjectController],
     })
 ], ProjectModule);
 //# sourceMappingURL=project.module.js.map

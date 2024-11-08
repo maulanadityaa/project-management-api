@@ -18,7 +18,13 @@ let AppModule = class AppModule {
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [common_module_1.CommonModule, auth_module_1.AuthModule, jwt_module_1.JwtAuthModule, technology_module_1.TechnologyModule, project_module_1.ProjectModule],
+        imports: [
+            common_module_1.CommonModule,
+            auth_module_1.AuthModule,
+            jwt_module_1.JwtAuthModule,
+            technology_module_1.TechnologyModule,
+            project_module_1.ProjectModule,
+        ],
         controllers: [],
         providers: [],
     })

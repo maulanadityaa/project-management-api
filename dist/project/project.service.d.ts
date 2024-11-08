@@ -1,12 +1,12 @@
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
 import { Logger } from 'winston';
-import { ProjectRequest, ProjectResponse, ProjectSearchRequest, ProjectUpdateRequest } from "../model/project.model";
+import { ProjectRequest, ProjectResponse, ProjectSearchRequest, ProjectUpdateRequest } from '../model/project.model';
 import { CloudinaryService } from '../common/cloudinary.service';
 import { Project } from '@prisma/client';
 import { TechnologyService } from '../technology/technology.service';
-import { JwtService } from "../jwt/jwt.service";
-import { CommonResponse } from "../model/common-response.model";
+import { JwtService } from '../jwt/jwt.service';
+import { CommonResponse } from '../model/common-response.model';
 export declare class ProjectService {
     private prismaService;
     private validationService;

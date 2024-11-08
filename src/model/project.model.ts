@@ -36,7 +36,7 @@ export class ProjectSearchRequest {
   @ApiPropertyOptional({example: 'Project Name', description: 'Project Name'})
   name?: string;
 
-  @ApiPropertyOptional({example: ['tech1', 'tech2'], description: 'Array of technologies', type: 'array', items: {type: 'string'}})
+  @ApiPropertyOptional({example: ['tech1', 'tech2'], description: 'Array of technologies (optional)', type: 'array', items: {type: 'string'}})
   techs?: any;
 
   @ApiPropertyOptional({example: 1, description: 'Page number (optional) - default 1'})

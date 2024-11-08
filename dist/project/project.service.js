@@ -45,7 +45,6 @@ let ProjectService = class ProjectService {
         }
         let techIds = [];
         for (const techId of createRequest.technologies) {
-            console.log('Checking technology:', techId);
             const tech = await this.technologyService.get(techId);
             if (tech) {
                 techIds.push(tech.id);
@@ -73,7 +72,6 @@ let ProjectService = class ProjectService {
                 },
             });
         });
-        console.log('Project created:', project);
         return await this.toProjectResponse(project);
     }
     async checkProjectMustExist(id) {
@@ -88,8 +86,8 @@ let ProjectService = class ProjectService {
                         technology: true,
                     },
                 },
-                user: true
-            }
+                user: true,
+            },
         });
         if (!project) {
             throw new common_1.HttpException('Project not found', 404);
@@ -116,8 +114,8 @@ let ProjectService = class ProjectService {
         const project = await this.checkProjectMustExist(updateRequest.id);
         const image = await this.prismaService.projectImage.findFirst({
             where: {
-                project_id: project.id
-            }
+                project_id: project.id,
+            },
         });
         let imageUrl = image.url;
         if (request.image !== undefined) {
@@ -126,7 +124,6 @@ let ProjectService = class ProjectService {
         }
         let techIds = [];
         for (const techId of updateRequest.technologies) {
-            console.log('Checking technology:', techId);
             const tech = await this.technologyService.get(techId);
             if (tech) {
                 techIds.push(tech.id);
@@ -156,8 +153,8 @@ let ProjectService = class ProjectService {
                         },
                         create: {
                             url: imageUrl,
-                        }
-                    }
+                        },
+                    },
                 },
             });
         });
@@ -205,7 +202,7 @@ let ProjectService = class ProjectService {
                         technology: true,
                     },
                 },
-                user: true
+                user: true,
             },
             take: searchRequest.size,
             skip: skip,
@@ -225,8 +222,8 @@ let ProjectService = class ProjectService {
                 currentPage: searchRequest.page,
                 totalPage: Math.ceil(total / searchRequest.size),
                 size: searchRequest.size,
-                totalRows: total
-            }
+                totalRows: total,
+            },
         };
     }
     async toProjectResponse(project) {
@@ -235,8 +232,8 @@ let ProjectService = class ProjectService {
                 project_technology: {
                     some: {
                         project_id: project.id,
-                    }
-                }
+                    },
+                },
             },
         });
         const image = await this.prismaService.projectImage.findFirst({
@@ -257,7 +254,7 @@ let ProjectService = class ProjectService {
             imageUrl: image.url,
             userResponse: {
                 username: user.username,
-                name: user.name
+                name: user.name,
             },
             createdAt: project.created_at,
             updatedAt: project.updated_at,

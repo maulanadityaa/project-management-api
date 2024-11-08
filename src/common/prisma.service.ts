@@ -1,10 +1,15 @@
-import { Inject, OnModuleInit } from "@nestjs/common";
-import { PrismaClient, Prisma } from "@prisma/client";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import { Logger } from "winston";
+import { Inject, OnModuleInit } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
-export class PrismaService extends PrismaClient<Prisma.PrismaClientOptions, string> implements OnModuleInit{
-  constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger){
+export class PrismaService
+  extends PrismaClient<Prisma.PrismaClientOptions, string>
+  implements OnModuleInit
+{
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+  ) {
     super({
       log: [
         {

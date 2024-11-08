@@ -52,7 +52,11 @@ exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('register'),
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'User registered', type: auth_model_1.UserResponse }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.CREATED,
+        description: 'User registered',
+        type: auth_model_1.UserResponse,
+    }),
     (0, swagger_1.ApiBody)({ type: auth_model_1.RegisterRequest }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -63,7 +67,11 @@ __decorate([
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Login to the system' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Login successful', type: auth_model_1.LoginResponse }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Login successful',
+        type: auth_model_1.LoginResponse,
+    }),
     (0, swagger_1.ApiBody)({ type: auth_model_1.LoginRequest }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -73,8 +81,15 @@ __decorate([
 __decorate([
     (0, common_1.Put)('update'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Update user information' }),
-    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'User updated', type: auth_model_1.UserResponse }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Update user information',
+        description: 'This endpoint requires a valid access token for authorization.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'User updated',
+        type: auth_model_1.UserResponse,
+    }),
     (0, swagger_1.ApiConsumes)('application/json'),
     (0, swagger_1.ApiBody)({ type: auth_model_1.UserUpdateRequest }),
     (0, swagger_1.ApiBearerAuth)(),

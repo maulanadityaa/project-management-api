@@ -15,7 +15,7 @@ export class ErrorFilter implements ExceptionFilter {
       response.status(exception.getStatus()).json({
         statusCode: exception.getStatus(),
         errors: exception.getResponse(),
-      })
+      });
     } else if (exception instanceof ZodError) {
       response.status(400).json({
         statusCode: 400,

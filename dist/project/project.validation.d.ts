@@ -1,4 +1,4 @@
-import { ZodType } from "zod";
+import { ZodType } from 'zod';
 export declare class ProjectValidation {
     static readonly CREATE: ZodType;
     static readonly UPDATE: ZodType;

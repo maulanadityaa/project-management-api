@@ -6,23 +6,6 @@ export class CloudinaryService {
   constructor(@Inject('Cloudinary') private cloudinaryInstance: typeof cloudinary) {}
 
   async uploadImage(file: Express.Multer.File): Promise<UploadApiResponse | UploadApiErrorResponse> {
-    console.log('Received file in uploadImage:', {
-      fieldname: file?.fieldname,
-      originalname: file?.originalname,
-      mimetype: file?.mimetype,
-      size: file?.size,
-      bufferSize: file?.buffer?.length,
-      hasBuffer: !!file?.buffer
-    });
-
-    if (!file) {
-      throw new HttpException('No file provided', 400);
-    }
-
-    if (!file.buffer) {
-      throw new HttpException('File buffer is undefined', 400);
-    }
-
     if (!file.mimetype.startsWith('image')) {
       throw new HttpException('Only image files are allowed!', 400);
     }

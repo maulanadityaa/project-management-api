@@ -97,7 +97,6 @@ let AuthService = class AuthService {
         this.logger.debug(`Updating user ${JSON.stringify(request)}`);
         const updateRequest = this.validationService.validate(auth_validation_1.AuthValidation.UPDATE, request);
         const decodedUser = await this.jwtService.verifyToken(token);
-        console.log(decodedUser);
         const user = await this.prismaService.user.findUnique({
             where: {
                 username: decodedUser.username,

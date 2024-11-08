@@ -1,15 +1,20 @@
-import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { ProjectRequest, ProjectResponse, ProjectSearchRequest, ProjectUpdateRequest } from "../model/project.model";
+import {
+  ProjectRequest,
+  ProjectResponse,
+  ProjectSearchRequest,
+  ProjectUpdateRequest,
+} from '../model/project.model';
 import { ProjectValidation } from './project.validation';
 import { CloudinaryService } from '../common/cloudinary.service';
 import { Project } from '@prisma/client';
 import { TechnologyService } from '../technology/technology.service';
-import { JwtService } from "../jwt/jwt.service";
-import { CommonResponse } from "../model/common-response.model";
+import { JwtService } from '../jwt/jwt.service';
+import { CommonResponse } from '../model/common-response.model';
 
 @Injectable()
 export class ProjectService {
@@ -19,11 +24,16 @@ export class ProjectService {
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private cloudinaryService: CloudinaryService,
     private technologyService: TechnologyService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
-  async create(token: string, request: ProjectRequest): Promise<ProjectResponse> {
-    this.logger.debug(`Creating project with data ${JSON.stringify(request.name)}`);
+  async create(
+    token: string,
+    request: ProjectRequest,
+  ): Promise<ProjectResponse> {
+    this.logger.debug(
+      `Creating project with data ${JSON.stringify(request.name)}`,
+    );
 
     const createRequest: ProjectRequest = this.validationService.validate(
       ProjectValidation.CREATE,
@@ -35,18 +45,15 @@ export class ProjectService {
       where: {
         id: userId,
       },
-    })
+    });
 
-    if(!user){
+    if (!user) {
       throw new HttpException('User not found', 404);
     }
 
     let techIds = [];
     for (const techId of createRequest.technologies) {
-      console.log('Checking technology:', techId);
-      const tech = await this.technologyService.get(
-        techId,
-      );
+      const tech = await this.technologyService.get(techId);
       if (tech) {
         techIds.push(tech.id);
       }
@@ -75,7 +82,6 @@ export class ProjectService {
         },
       });
     });
-    console.log('Project created:', project);
 
     return await this.toProjectResponse(project);
   }
@@ -92,8 +98,8 @@ export class ProjectService {
             technology: true,
           },
         },
-        user: true
-      }
+        user: true,
+      },
     });
 
     if (!project) {
@@ -111,8 +117,13 @@ export class ProjectService {
     return await this.toProjectResponse(project);
   }
 
-  async update(token: string, request: ProjectUpdateRequest): Promise<ProjectResponse> {
-    this.logger.debug(`Updating project with data ${JSON.stringify(request.name)}`);
+  async update(
+    token: string,
+    request: ProjectUpdateRequest,
+  ): Promise<ProjectResponse> {
+    this.logger.debug(
+      `Updating project with data ${JSON.stringify(request.name)}`,
+    );
 
     const updateRequest: ProjectUpdateRequest = this.validationService.validate(
       ProjectValidation.UPDATE,
@@ -124,70 +135,71 @@ export class ProjectService {
       where: {
         id: userId,
       },
-    })
+    });
 
-    if(!user){
+    if (!user) {
       throw new HttpException('User not found', 404);
     }
 
     const project = await this.checkProjectMustExist(updateRequest.id);
     const image = await this.prismaService.projectImage.findFirst({
       where: {
-        project_id: project.id
-      }
-    })
+        project_id: project.id,
+      },
+    });
     let imageUrl = image.url;
 
-    if(request.image !== undefined){
+    if (request.image !== undefined) {
       const image = await this.cloudinaryService.uploadImage(request.image);
       imageUrl = image.secure_url;
     }
 
     let techIds = [];
     for (const techId of updateRequest.technologies) {
-      console.log('Checking technology:', techId);
-      const tech = await this.technologyService.get(
-        techId,
-      );
+      const tech = await this.technologyService.get(techId);
       if (tech) {
         techIds.push(tech.id);
       }
     }
 
-    const updatedProject = await this.prismaService.$transaction(async (prisma) => {
-      return prisma.project.update({
-        where: {
-          id: updateRequest.id,
-        },
-        data: {
-          name: updateRequest.name,
-          description: updateRequest.description,
-          project_technology: {
-            deleteMany: {
-              project_id: updateRequest.id,
-            },
-            create: techIds.map((id) => {
-              return {
-                technology_id: id,
-              };
-            }),
+    const updatedProject = await this.prismaService.$transaction(
+      async (prisma) => {
+        return prisma.project.update({
+          where: {
+            id: updateRequest.id,
           },
-          project_image: {
-            deleteMany: {
-              project_id: updateRequest.id,
+          data: {
+            name: updateRequest.name,
+            description: updateRequest.description,
+            project_technology: {
+              deleteMany: {
+                project_id: updateRequest.id,
+              },
+              create: techIds.map((id) => {
+                return {
+                  technology_id: id,
+                };
+              }),
             },
-            create: {
-              url: imageUrl,
-            }
-          }
-        },
-      });
-    });
+            project_image: {
+              deleteMany: {
+                project_id: updateRequest.id,
+              },
+              create: {
+                url: imageUrl,
+              },
+            },
+          },
+        });
+      },
+    );
 
     return await this.toProjectResponse(updatedProject);
   }
 
-  async search(request: ProjectSearchRequest): Promise<CommonResponse<ProjectResponse[]>> {
+  async search(
+    request: ProjectSearchRequest,
+  ): Promise<CommonResponse<ProjectResponse[]>> {
     this.logger.debug(`Searching project with data ${JSON.stringify(request)}`);
 
     const searchRequest: ProjectSearchRequest = this.validationService.validate(
@@ -197,7 +209,7 @@ export class ProjectService {
 
     const filters = [];
 
-    if(searchRequest.name) {
+    if (searchRequest.name) {
       filters.push({
         name: {
           contains: searchRequest.name,
@@ -209,9 +221,7 @@ export class ProjectService {
     if (searchRequest.techs && searchRequest.techs.length > 0) {
       let techIds = [];
       for (const techId of searchRequest.techs) {
-        const tech = await this.technologyService.getByName(
-          techId,
-        );
+        const tech = await this.technologyService.getByName(techId);
         if (tech) {
           techIds.push(tech.id);
         }
@@ -241,7 +251,7 @@ export class ProjectService {
             technology: true,
           },
         },
-        user: true
+        user: true,
       },
       take: searchRequest.size,
       skip: skip,
@@ -251,31 +261,33 @@ export class ProjectService {
       where: {
         AND: filters,
       },
-    })
+    });
 
     return {
       statusCode: HttpStatus.OK,
       message: 'Projects found',
-      data: await Promise.all(projects.map(async (project) => {
-        return await this.toProjectResponse(project);
-      })),
+      data: await Promise.all(
+        projects.map(async (project) => {
+          return await this.toProjectResponse(project);
+        }),
+      ),
       paging: {
         currentPage: searchRequest.page,
         totalPage: Math.ceil(total / searchRequest.size),
         size: searchRequest.size,
-        totalRows: total
-      }
-    }
+        totalRows: total,
+      },
+    };
   }
 
   async toProjectResponse(project: Project): Promise<ProjectResponse> {
     const technologies = await this.prismaService.technology.findMany({
       where: {
-        project_technology : {
+        project_technology: {
           some: {
             project_id: project.id,
-          }
-        }
+          },
+        },
       },
     });
 
@@ -289,7 +301,7 @@ export class ProjectService {
       where: {
         id: project.user_id,
       },
-    })
+    });
 
     return {
       id: project.id,
@@ -299,7 +311,7 @@ export class ProjectService {
       imageUrl: image.url,
       userResponse: {
         username: user.username,
-        name: user.name
+        name: user.name,
       },
       createdAt: project.created_at,
       updatedAt: project.updated_at,

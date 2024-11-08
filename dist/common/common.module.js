@@ -80,11 +80,22 @@ exports.CommonModule = CommonModule = __decorate([
             }),
             jwt_module_1.JwtAuthModule,
         ],
-        providers: [prisma_service_1.PrismaService, validation_service_1.ValidationService, cloudinary_provider_1.CloudinaryProvider, cloudinary_service_1.CloudinaryService, {
+        providers: [
+            prisma_service_1.PrismaService,
+            validation_service_1.ValidationService,
+            cloudinary_provider_1.CloudinaryProvider,
+            cloudinary_service_1.CloudinaryService,
+            {
                 provide: core_1.APP_FILTER,
                 useClass: error_filter_1.ErrorFilter,
-            }],
-        exports: [prisma_service_1.PrismaService, validation_service_1.ValidationService, cloudinary_provider_1.CloudinaryProvider, cloudinary_service_1.CloudinaryService],
+            },
+        ],
+        exports: [
+            prisma_service_1.PrismaService,
+            validation_service_1.ValidationService,
+            cloudinary_provider_1.CloudinaryProvider,
+            cloudinary_service_1.CloudinaryService,
+        ],
     })
 ], CommonModule);
 //# sourceMappingURL=common.module.js.map

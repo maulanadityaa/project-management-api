@@ -45,7 +45,10 @@ __decorate([
     __metadata("design:type", String)
 ], UserUpdateRequest.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'test_password', description: 'Password (optional)' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'test_password',
+        description: 'Password (optional)',
+    }),
     __metadata("design:type", String)
 ], UserUpdateRequest.prototype, "password", void 0);
 class UserResponse {

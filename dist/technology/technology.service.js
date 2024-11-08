@@ -30,9 +30,9 @@ let TechnologyService = class TechnologyService {
             where: {
                 name: {
                     equals: techName,
-                    mode: 'insensitive'
-                }
-            }
+                    mode: 'insensitive',
+                },
+            },
         });
         if (tech) {
             throw new common_1.HttpException('Technology already exists', 400);
@@ -42,8 +42,8 @@ let TechnologyService = class TechnologyService {
     async checkTechMustExists(techId) {
         const tech = await this.prismaService.technology.findUnique({
             where: {
-                id: techId
-            }
+                id: techId,
+            },
         });
         if (!tech) {
             throw new common_1.HttpException(`Technology with id: ${techId} not found`, 404);
@@ -55,11 +55,11 @@ let TechnologyService = class TechnologyService {
         const techRequest = this.validationService.validate(technology_validation_1.TechnologyValidation.CREATE, request);
         let technology = await this.checkTechExists(techRequest.name);
         technology = await this.prismaService.technology.create({
-            data: techRequest
+            data: techRequest,
         });
         return {
             id: technology.id,
-            name: technology.name
+            name: technology.name,
         };
     }
     async update(request) {
@@ -68,15 +68,15 @@ let TechnologyService = class TechnologyService {
         let technology = await this.checkTechMustExists(techUpdateRequest.id);
         technology = await this.prismaService.technology.update({
             where: {
-                id: techUpdateRequest.id
+                id: techUpdateRequest.id,
             },
             data: {
-                name: techUpdateRequest.name
-            }
+                name: techUpdateRequest.name,
+            },
         });
         return {
             id: technology.id,
-            name: technology.name
+            name: technology.name,
         };
     }
     async delete(id) {
@@ -84,12 +84,12 @@ let TechnologyService = class TechnologyService {
         let technology = await this.checkTechMustExists(id);
         technology = await this.prismaService.technology.delete({
             where: {
-                id
-            }
+                id,
+            },
         });
         return {
             id: technology.id,
-            name: technology.name
+            name: technology.name,
         };
     }
     async get(id) {
@@ -97,7 +97,7 @@ let TechnologyService = class TechnologyService {
         const technology = await this.checkTechMustExists(id);
         return {
             id: technology.id,
-            name: technology.name
+            name: technology.name,
         };
     }
     async getByName(name) {
@@ -106,24 +106,24 @@ let TechnologyService = class TechnologyService {
             where: {
                 name: {
                     equals: name,
-                    mode: 'insensitive'
-                }
-            }
+                    mode: 'insensitive',
+                },
+            },
         });
         if (!technology) {
             throw new common_1.HttpException('Technology not found', 404);
         }
         return {
             id: technology.id,
-            name: technology.name
+            name: technology.name,
         };
     }
     async list() {
         this.logger.debug(`Listing technologies`);
         const technologies = await this.prismaService.technology.findMany();
-        return technologies.map(technology => ({
+        return technologies.map((technology) => ({
             id: technology.id,
-            name: technology.name
+            name: technology.name,
         }));
     }
 };

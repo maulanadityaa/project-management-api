@@ -1,2 +1,2 @@
-import { Provider } from "@nestjs/common";
+import { Provider } from '@nestjs/common';
 export declare const CloudinaryProvider: Provider;

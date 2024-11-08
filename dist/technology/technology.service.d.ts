@@ -1,8 +1,8 @@
-import { PrismaService } from "../common/prisma.service";
-import { ValidationService } from "../common/validation.service";
-import { Logger } from "winston";
-import { TechRequest, TechResponse, TechUpdateRequest } from "../model/technology.model";
-import { Technology } from "@prisma/client";
+import { PrismaService } from '../common/prisma.service';
+import { ValidationService } from '../common/validation.service';
+import { Logger } from 'winston';
+import { TechRequest, TechResponse, TechUpdateRequest } from '../model/technology.model';
+import { Technology } from '@prisma/client';
 export declare class TechnologyService {
     private prismaService;
     private validationService;

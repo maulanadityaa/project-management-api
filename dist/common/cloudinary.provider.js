@@ -13,6 +13,6 @@ exports.CloudinaryProvider = {
             api_secret: configService.get('CLOUDINARY_API_SECRET'),
         });
         return cloudinary_1.v2;
-    }
+    },
 };
 //# sourceMappingURL=cloudinary.provider.js.map
