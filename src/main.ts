@@ -21,15 +21,15 @@ async function bootstrap() {
     .setDescription(process.env.APP_DESCRIPTION)
     .setVersion(process.env.APP_VERSION)
     .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth',
+      // {
+      //   type: 'http',
+      //   scheme: 'bearer',
+      //   bearerFormat: 'JWT',
+      //   name: 'JWT',
+      //   description: 'Enter JWT token',
+      //   in: 'header',
+      // },
+      // 'JWT-auth',
     )
     .addServer(process.env.APP_LOCAL_URL)
     .addServer(process.env.APP_PROD_URL)

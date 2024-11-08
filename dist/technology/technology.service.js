@@ -46,7 +46,7 @@ let TechnologyService = class TechnologyService {
             }
         });
         if (!tech) {
-            throw new common_1.HttpException('Technology not found', 404);
+            throw new common_1.HttpException(`Technology with id: ${techId} not found`, 404);
         }
         return tech;
     }

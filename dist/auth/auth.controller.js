@@ -39,6 +39,7 @@ let AuthController = class AuthController {
         };
     }
     async update(token, request) {
+        console.log(token);
         const result = await this.authService.update(token, request);
         return {
             statusCode: common_1.HttpStatus.OK,
@@ -52,6 +53,7 @@ __decorate([
     (0, common_1.Post)('register'),
     (0, swagger_1.ApiOperation)({ summary: 'Register a new user' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.CREATED, description: 'User registered', type: auth_model_1.UserResponse }),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.RegisterRequest }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_model_1.RegisterRequest]),
@@ -62,6 +64,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Login to the system' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Login successful', type: auth_model_1.LoginResponse }),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.LoginRequest }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [auth_model_1.LoginRequest]),
@@ -72,6 +75,9 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Update user information' }),
     (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'User updated', type: auth_model_1.UserResponse }),
+    (0, swagger_1.ApiConsumes)('application/json'),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.UserUpdateRequest }),
+    (0, swagger_1.ApiBearerAuth)(),
     __param(0, (0, auth_decorator_1.Auth)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

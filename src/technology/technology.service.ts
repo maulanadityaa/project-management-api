@@ -40,7 +40,7 @@ export class TechnologyService {
     });
 
     if (!tech) {
-      throw new HttpException('Technology not found', 404);
+      throw new HttpException(`Technology with id: ${techId} not found`, 404);
     }
 
     return tech;

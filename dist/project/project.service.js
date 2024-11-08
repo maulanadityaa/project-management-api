@@ -43,15 +43,6 @@ let ProjectService = class ProjectService {
         if (!user) {
             throw new common_1.HttpException('User not found', 404);
         }
-        console.log('Service received file:', {
-            fieldname: request.image?.fieldname,
-            originalname: request.image?.originalname,
-            mimetype: request.image?.mimetype,
-            size: request.image?.size,
-            hasBuffer: !!request.image?.buffer,
-        });
-        const image = await this.cloudinaryService.uploadImage(createRequest.image);
-        console.log('secure URL', image.secure_url);
         let techIds = [];
         for (const techId of createRequest.technologies) {
             console.log('Checking technology:', techId);
@@ -60,6 +51,7 @@ let ProjectService = class ProjectService {
                 techIds.push(tech.id);
             }
         }
+        const image = await this.cloudinaryService.uploadImage(createRequest.image);
         const project = await this.prismaService.$transaction(async (prisma) => {
             return prisma.project.create({
                 data: {

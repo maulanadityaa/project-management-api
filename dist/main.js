@@ -33,22 +33,16 @@ async function bootstrap() {
     const logger = app.get(nest_winston_1.WINSTON_MODULE_NEST_PROVIDER);
     app.useLogger(logger);
     app.enableCors({
-        origin: true,
+        origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: 'Content-Type, Accept, Authorization',
         credentials: true,
     });
     const config = new swagger_1.DocumentBuilder()
         .setTitle(process.env.APP_NAME)
         .setDescription(process.env.APP_DESCRIPTION)
         .setVersion(process.env.APP_VERSION)
-        .addBearerAuth({
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-    }, 'JWT-auth')
+        .addBearerAuth()
         .addServer(process.env.APP_LOCAL_URL)
         .addServer(process.env.APP_PROD_URL)
         .build();

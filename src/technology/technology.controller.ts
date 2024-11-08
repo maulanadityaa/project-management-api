@@ -15,7 +15,7 @@ import { TechRequest, TechResponse, TechUpdateRequest } from "../model/technolog
 import { CommonResponse } from "../model/common-response.model";
 import { CloudinaryService } from "../common/cloudinary.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 @Controller('/api/v1/technologies')
 export class TechnologyController {
@@ -26,6 +26,7 @@ export class TechnologyController {
   @ApiOperation({ summary: 'Create a new technology' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Technology created', type: TechResponse })
   @ApiBody({ type: TechRequest })
+  @ApiBearerAuth()
   async create(@Body() request: TechRequest): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.create(request);
 
@@ -41,6 +42,7 @@ export class TechnologyController {
   @ApiOperation({ summary: 'Update a technology' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Technology updated', type: TechResponse })
   @ApiBody({ type: TechUpdateRequest })
+  @ApiBearerAuth()
   async update(@Body() request: TechUpdateRequest): Promise<CommonResponse<TechResponse>> {
     const result = await this.technologyService.update(request);
 

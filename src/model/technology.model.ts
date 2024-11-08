@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class TechRequest {
   @ApiProperty({example: 'Technology Name', description: 'Technology Name'})
@@ -9,7 +9,7 @@ export class TechUpdateRequest {
   @ApiProperty({example: 'ValidUUIDv4', description: 'Technology ID'})
   id: string;
 
-  @ApiProperty({example: 'Updated Technology Name', description: 'Technology Name (optional)'})
+  @ApiPropertyOptional({example: 'Updated Technology Name', description: 'Technology Name (optional)'})
   name: string;
 }
 

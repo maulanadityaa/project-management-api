@@ -3,7 +3,7 @@ import { AuthService } from "./auth.service";
 import { LoginRequest, LoginResponse, RegisterRequest, UserResponse, UserUpdateRequest } from "../model/auth.model";
 import { CommonResponse } from "../model/common-response.model";
 import { Auth } from "../common/auth.decorator";
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -46,11 +46,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update user information' })
   @ApiResponse({ status: HttpStatus.OK, description: 'User updated', type: UserResponse })
+  @ApiConsumes('application/json')
   @ApiBody({ type: UserUpdateRequest })
+  @ApiBearerAuth()
   async update(
     @Auth() token: string,
     @Body() request: UserUpdateRequest
   ): Promise<CommonResponse<UserResponse>> {
+    console.log(token);
     const result = await this.authService.update(token, request);
 
     return {

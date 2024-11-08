@@ -1,5 +1,5 @@
 import { UserResponse } from "./auth.model";
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ProjectRequest {
   @ApiProperty({example: 'Project Name', description: 'Project Name'})
@@ -8,8 +8,8 @@ export class ProjectRequest {
   @ApiProperty({example: 'Project Description', description: 'Project Description'})
   description?: string;
 
-  @ApiProperty({example: ['tech1', 'tech2'], description: 'Array of technologies'})
-  technologies: string[];
+  @ApiProperty({example: ['tech1', 'tech2'], description: 'Array of technologies', type: 'array', items: {type: 'string'}})
+  technologies: any;
 
   @ApiProperty({example: 'image.jpg', description: 'Project Image', type: 'string', format: 'binary'})
   image: Express.Multer.File
@@ -19,30 +19,30 @@ export class ProjectUpdateRequest {
   @ApiProperty({example: 'ValidUUIDv4', description: 'Project ID'})
   id: string;
 
-  @ApiProperty({example: 'Updated Project Name', description: 'Project Name (optional)'})
+  @ApiPropertyOptional({example: 'Updated Project Name', description: 'Project Name (optional)'})
   name?: string;
 
-  @ApiProperty({example: 'Updated Project Description', description: 'Project Description (optional)'})
+  @ApiPropertyOptional({example: 'Updated Project Description', description: 'Project Description (optional)'})
   description?: string;
 
-  @ApiProperty({example: ['tech1', 'tech2'], description: 'Array of technologies (optional)'})
-  technologies?: string[];
+  @ApiPropertyOptional({example: ['tech1', 'tech2'], description: 'Array of technologies (optional)', type: 'array', items: {type: 'string'}})
+  technologies?: any;
 
-  @ApiProperty({example: 'image.jpg', description: 'Project Image (optional)', type: 'string', format: 'binary'})
+  @ApiPropertyOptional({example: 'image.jpg', description: 'Project Image (optional)', type: 'string', format: 'binary'})
   image?: Express.Multer.File
 }
 
 export class ProjectSearchRequest {
-  @ApiProperty({example: 'Project Name', description: 'Project Name'})
+  @ApiPropertyOptional({example: 'Project Name', description: 'Project Name'})
   name?: string;
 
-  @ApiProperty({example: ['tech1', 'tech2'], description: 'Array of technologies'})
-  techs?: string[];
+  @ApiPropertyOptional({example: ['tech1', 'tech2'], description: 'Array of technologies', type: 'array', items: {type: 'string'}})
+  techs?: any;
 
-  @ApiProperty({example: 1, description: 'Page number (optional) - default 1'})
+  @ApiPropertyOptional({example: 1, description: 'Page number (optional) - default 1'})
   page?: number;
 
-  @ApiProperty({example: 10, description: 'Page size (optional) - default 10'})
+  @ApiPropertyOptional({example: 10, description: 'Page size (optional) - default 10'})
   size?: number;
 }
 
@@ -62,6 +62,7 @@ export class ProjectResponse {
   @ApiProperty({example: 'cloudinary-secure-url', description: 'Project Image'})
   imageUrl: string;
 
+  @ApiProperty({example: UserResponse, description: 'User'})
   userResponse: UserResponse;
 
   @ApiProperty({example: '2021-01-01T00:00:00.000Z', description: 'Created At'})

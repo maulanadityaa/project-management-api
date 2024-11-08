@@ -25,7 +25,7 @@ import {
 import { CommonResponse } from '../model/common-response.model';
 import { memoryStorage } from 'multer';
 import { Auth } from '../common/auth.decorator';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('/api/v1/projects')
 export class ProjectController {
@@ -65,9 +65,10 @@ export class ProjectController {
       description: request.description,
       technologies: Array.isArray(request.technologies)
         ? request.technologies
-        : [request.technologies],
+        : request.technologies.split(','),
       image: image,
     };
+    console.log(projectData);
 
     const result = await this.projectService.create(token, projectData);
 
@@ -94,6 +95,7 @@ export class ProjectController {
   @ApiBody({
     type: ProjectUpdateRequest
   })
+  @ApiBearerAuth()
   async update(
     @Auth() token: string,
     @Body() request: ProjectUpdateRequest,
@@ -114,7 +116,7 @@ export class ProjectController {
       description: request.description,
       technologies: Array.isArray(request.technologies)
         ? request.technologies
-        : [request.technologies],
+        : request.technologies.split(','),
       image: image,
     };
 
@@ -148,20 +150,19 @@ export class ProjectController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Search projects' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Projects found' })
-  @ApiParam({ name: 'name', description: 'Project Name', example: 'Project Name', required: false })
-  @ApiParam({ name: 'techs', description: 'Array of technologies', example: ['tech1', 'tech2'], required: false })
-  @ApiParam({ name: 'page', description: 'Page number (optional) - default 1', example: 1, required: false })
-  @ApiParam({ name: 'size', description: 'Page size (optional) - default 10', example: 10, required: false })
+  @ApiQuery({ name: 'name', description: 'Project Name', example: 'Project Name', required: false })
+  @ApiQuery({ name: 'techs', description: 'Array of technologies', example: ['tech1', 'tech2'], required: false })
+  @ApiQuery({ name: 'page', description: 'Page number (optional) - default 1', example: 1, required: false })
+  @ApiQuery({ name: 'size', description: 'Page size (optional) - default 10', example: 10, required: false })
   async search(
     @Query('name') name?: string,
-    @Query('techs') techs?: string[],
+    @Query('techs') techs?: any,
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
   ): Promise<CommonResponse<ProjectResponse[]>> {
-    console.log('Searching projects:', { name, techs, page, size });
     const request: ProjectSearchRequest = {
       name: name,
-      techs: techs,
+      techs: Array.isArray(techs) ? techs : techs?.split(','),
       page: parseInt(String(page)) || 1,
       size: parseInt(String(size)) || 10,
     };

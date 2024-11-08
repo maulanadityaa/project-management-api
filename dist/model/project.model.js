@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProjectResponse = exports.ProjectSearchRequest = exports.ProjectUpdateRequest = exports.ProjectRequest = void 0;
+const auth_model_1 = require("./auth.model");
 const swagger_1 = require("@nestjs/swagger");
 class ProjectRequest {
 }
@@ -23,8 +24,8 @@ __decorate([
     __metadata("design:type", String)
 ], ProjectRequest.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: ['tech1', 'tech2'], description: 'Array of technologies' }),
-    __metadata("design:type", Array)
+    (0, swagger_1.ApiProperty)({ example: ['tech1', 'tech2'], description: 'Array of technologies', type: 'array', items: { type: 'string' } }),
+    __metadata("design:type", Object)
 ], ProjectRequest.prototype, "technologies", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'image.jpg', description: 'Project Image', type: 'string', format: 'binary' }),
@@ -38,38 +39,38 @@ __decorate([
     __metadata("design:type", String)
 ], ProjectUpdateRequest.prototype, "id", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Updated Project Name', description: 'Project Name (optional)' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Updated Project Name', description: 'Project Name (optional)' }),
     __metadata("design:type", String)
 ], ProjectUpdateRequest.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Updated Project Description', description: 'Project Description (optional)' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Updated Project Description', description: 'Project Description (optional)' }),
     __metadata("design:type", String)
 ], ProjectUpdateRequest.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: ['tech1', 'tech2'], description: 'Array of technologies (optional)' }),
-    __metadata("design:type", Array)
+    (0, swagger_1.ApiPropertyOptional)({ example: ['tech1', 'tech2'], description: 'Array of technologies (optional)', type: 'array', items: { type: 'string' } }),
+    __metadata("design:type", Object)
 ], ProjectUpdateRequest.prototype, "technologies", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'image.jpg', description: 'Project Image (optional)', type: 'string', format: 'binary' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'image.jpg', description: 'Project Image (optional)', type: 'string', format: 'binary' }),
     __metadata("design:type", Object)
 ], ProjectUpdateRequest.prototype, "image", void 0);
 class ProjectSearchRequest {
 }
 exports.ProjectSearchRequest = ProjectSearchRequest;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Project Name', description: 'Project Name' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Project Name', description: 'Project Name' }),
     __metadata("design:type", String)
 ], ProjectSearchRequest.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: ['tech1', 'tech2'], description: 'Array of technologies' }),
-    __metadata("design:type", Array)
+    (0, swagger_1.ApiPropertyOptional)({ example: ['tech1', 'tech2'], description: 'Array of technologies', type: 'array', items: { type: 'string' } }),
+    __metadata("design:type", Object)
 ], ProjectSearchRequest.prototype, "techs", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 1, description: 'Page number (optional) - default 1' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 1, description: 'Page number (optional) - default 1' }),
     __metadata("design:type", Number)
 ], ProjectSearchRequest.prototype, "page", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 10, description: 'Page size (optional) - default 10' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: 10, description: 'Page size (optional) - default 10' }),
     __metadata("design:type", Number)
 ], ProjectSearchRequest.prototype, "size", void 0);
 class ProjectResponse {
@@ -95,6 +96,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'cloudinary-secure-url', description: 'Project Image' }),
     __metadata("design:type", String)
 ], ProjectResponse.prototype, "imageUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: auth_model_1.UserResponse, description: 'User' }),
+    __metadata("design:type", auth_model_1.UserResponse)
+], ProjectResponse.prototype, "userResponse", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '2021-01-01T00:00:00.000Z', description: 'Created At' }),
     __metadata("design:type", Date)
