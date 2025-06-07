@@ -9,8 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DecodedUser = exports.LoginResponse = exports.UserResponse = exports.UserUpdateRequest = exports.LoginRequest = exports.RegisterRequest = void 0;
+exports.DecodedUser = exports.LoginResponse = exports.UserResponse = exports.UserUpdateRequest = exports.LoginRequest = exports.RegisterRequest = exports.CheckUsernameRequest = void 0;
 const swagger_1 = require("@nestjs/swagger");
+class CheckUsernameRequest {
+}
+exports.CheckUsernameRequest = CheckUsernameRequest;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
+    __metadata("design:type", String)
+], CheckUsernameRequest.prototype, "username", void 0);
 class RegisterRequest {
 }
 exports.RegisterRequest = RegisterRequest;

@@ -4,6 +4,20 @@ export class ProjectValidation {
   static readonly CREATE: ZodType = z.object({
     name: z.string().min(1).max(255),
     description: z.string().min(1).max(255).optional(),
+    link: z
+      .string()
+      .url()
+      .refine(
+        (url) => {
+          const domainMatch = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+          if (!domainMatch) return false;
+          const domain = domainMatch[1];
+          return /\.\w{2,}$/.test(domain);
+        },
+        {
+          message: "URL must have a valid domain with a TLD (e.g., '.com')",
+        },
+      ),
     technologies: z.array(z.string().min(1).max(255)),
     image: z.object({
       fieldname: z.string(),
@@ -26,6 +40,21 @@ export class ProjectValidation {
     id: z.string().min(1).max(255),
     name: z.string().min(1).max(255).optional(),
     description: z.string().min(1).max(255).optional(),
+    link: z
+      .string()
+      .url()
+      .refine(
+        (url) => {
+          const domainMatch = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+          if (!domainMatch) return false;
+          const domain = domainMatch[1];
+          return /\.\w{2,}$/.test(domain);
+        },
+        {
+          message: "URL must have a valid domain with a TLD (e.g., '.com')",
+        },
+      )
+      .optional(),
     technologies: z.array(z.string().min(1).max(255)).optional(),
     image: z
       .object({

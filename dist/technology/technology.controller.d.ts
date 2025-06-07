@@ -6,6 +6,7 @@ export declare class TechnologyController {
     constructor(technologyService: TechnologyService);
     create(request: TechRequest): Promise<CommonResponse<TechResponse>>;
     update(request: TechUpdateRequest): Promise<CommonResponse<TechResponse>>;
+    getByName(techName: string): Promise<CommonResponse<TechResponse>>;
     get(techId: string): Promise<CommonResponse<TechResponse>>;
     list(): Promise<CommonResponse<TechResponse[]>>;
     delete(techId: string): Promise<CommonResponse<boolean>>;

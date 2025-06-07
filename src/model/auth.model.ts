@@ -1,5 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+export class CheckUsernameRequest {
+  @ApiProperty({ example: 'test_username', description: 'Username' })
+  username: string;
+}
+
 export class RegisterRequest {
   @ApiProperty({ example: 'test_username', description: 'Username' })
   username: string;

@@ -25,15 +25,8 @@ let ProjectController = class ProjectController {
         this.projectService = projectService;
     }
     async create(token, request, image) {
-        const projectData = {
-            name: request.name,
-            description: request.description,
-            technologies: Array.isArray(request.technologies)
-                ? request.technologies
-                : request.technologies.split(','),
-            image: image,
-        };
-        const result = await this.projectService.create(token, projectData);
+        request.image = image;
+        const result = await this.projectService.create(token, request);
         return {
             statusCode: 201,
             message: 'Project created',
@@ -41,21 +34,22 @@ let ProjectController = class ProjectController {
         };
     }
     async update(token, request, image) {
-        const projectData = {
-            id: request.id,
-            name: request.name,
-            description: request.description,
-            technologies: Array.isArray(request.technologies)
-                ? request.technologies
-                : request.technologies.split(','),
-            image: image,
-        };
-        const result = await this.projectService.update(token, projectData);
+        request.image = image;
+        const result = await this.projectService.update(token, request);
         return {
             statusCode: 200,
             message: 'Project updated',
             data: result,
         };
+    }
+    async searchPerUser(token, name, techs, page = 1, size = 10) {
+        const request = {
+            name: name,
+            techs: Array.isArray(techs) ? techs : techs?.split(','),
+            page: parseInt(String(page)) || 1,
+            size: parseInt(String(size)) || 10,
+        };
+        return await this.projectService.getProjectsPerUser(token, request);
     }
     async get(projectId) {
         const result = await this.projectService.get(projectId);
@@ -73,6 +67,22 @@ let ProjectController = class ProjectController {
             size: parseInt(String(size)) || 10,
         };
         return await this.projectService.search(request);
+    }
+    async delete(token, projectId) {
+        const result = await this.projectService.delete(token, projectId);
+        return {
+            statusCode: 200,
+            message: 'Project deleted',
+            data: result,
+        };
+    }
+    async reactivate(token, projectId) {
+        const result = await this.projectService.reactivate(token, projectId);
+        return {
+            statusCode: 200,
+            message: 'Project reactivated',
+            data: result,
+        };
     }
 };
 exports.ProjectController = ProjectController;
@@ -143,6 +153,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProjectController.prototype, "update", null);
 __decorate([
+    (0, common_1.Get)('/search-per-user'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Search projects per user' }),
+    (0, swagger_1.ApiResponse)({ status: common_1.HttpStatus.OK, description: 'Projects found' }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, auth_decorator_1.Auth)()),
+    __param(1, (0, common_1.Query)('name')),
+    __param(2, (0, common_1.Query)('techs')),
+    __param(3, (0, common_1.Query)('page')),
+    __param(4, (0, common_1.Query)('size')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object, Number, Number]),
+    __metadata("design:returntype", Promise)
+], ProjectController.prototype, "searchPerUser", null);
+__decorate([
     (0, common_1.Get)('/:projectId'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Get a project' }),
@@ -194,6 +219,44 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Number, Number]),
     __metadata("design:returntype", Promise)
 ], ProjectController.prototype, "search", null);
+__decorate([
+    (0, common_1.Delete)('/:projectId'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Delete a project',
+        description: 'This endpoint requires a valid access token for authorization.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Project delete',
+        type: Boolean,
+    }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, auth_decorator_1.Auth)()),
+    __param(1, (0, common_1.Param)('projectId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ProjectController.prototype, "delete", null);
+__decorate([
+    (0, common_1.Patch)('/:projectId/reactivate'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Reactivate a project',
+        description: 'This endpoint requires a valid access token for authorization.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Project reactivated',
+        type: project_model_1.ProjectResponse,
+    }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, auth_decorator_1.Auth)()),
+    __param(1, (0, common_1.Param)('projectId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ProjectController.prototype, "reactivate", null);
 exports.ProjectController = ProjectController = __decorate([
     (0, common_1.Controller)('/api/v1/projects'),
     __metadata("design:paramtypes", [project_service_1.ProjectService])

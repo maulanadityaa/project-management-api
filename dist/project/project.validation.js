@@ -8,6 +8,18 @@ exports.ProjectValidation = ProjectValidation;
 ProjectValidation.CREATE = zod_1.z.object({
     name: zod_1.z.string().min(1).max(255),
     description: zod_1.z.string().min(1).max(255).optional(),
+    link: zod_1.z
+        .string()
+        .url()
+        .refine((url) => {
+        const domainMatch = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+        if (!domainMatch)
+            return false;
+        const domain = domainMatch[1];
+        return /\.\w{2,}$/.test(domain);
+    }, {
+        message: "URL must have a valid domain with a TLD (e.g., '.com')",
+    }),
     technologies: zod_1.z.array(zod_1.z.string().min(1).max(255)),
     image: zod_1.z.object({
         fieldname: zod_1.z.string(),
@@ -29,6 +41,19 @@ ProjectValidation.UPDATE = zod_1.z.object({
     id: zod_1.z.string().min(1).max(255),
     name: zod_1.z.string().min(1).max(255).optional(),
     description: zod_1.z.string().min(1).max(255).optional(),
+    link: zod_1.z
+        .string()
+        .url()
+        .refine((url) => {
+        const domainMatch = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+        if (!domainMatch)
+            return false;
+        const domain = domainMatch[1];
+        return /\.\w{2,}$/.test(domain);
+    }, {
+        message: "URL must have a valid domain with a TLD (e.g., '.com')",
+    })
+        .optional(),
     technologies: zod_1.z.array(zod_1.z.string().min(1).max(255)).optional(),
     image: zod_1.z
         .object({

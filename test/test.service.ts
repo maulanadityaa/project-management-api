@@ -142,6 +142,7 @@ export class TestService {
       data: {
         name: 'test project',
         description: 'test description',
+        link: 'https://test.com',
         project_image: {
           create: {
             url: image,
@@ -190,6 +191,7 @@ export class TestService {
       id: project.id,
       name: project.name,
       description: project.description,
+      link: project.link,
       technologies: technologies.map((technology) => technology.name),
       imageUrl: image.url,
       userResponse: {

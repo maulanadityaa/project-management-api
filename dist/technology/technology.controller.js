@@ -37,6 +37,14 @@ let TechnologyController = class TechnologyController {
             data: result,
         };
     }
+    async getByName(techName) {
+        const result = await this.technologyService.getByName(techName);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: 'Technology retrieved',
+            data: result,
+        };
+    }
     async get(techId) {
         const result = await this.technologyService.get(techId);
         return {
@@ -100,6 +108,21 @@ __decorate([
     __metadata("design:paramtypes", [technology_model_1.TechUpdateRequest]),
     __metadata("design:returntype", Promise)
 ], TechnologyController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)('/name/:techName'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a technology by name' }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Technology retrieved',
+        type: technology_model_1.TechResponse,
+    }),
+    (0, swagger_1.ApiParam)({ name: 'techName', type: String, example: 'React' }),
+    __param(0, (0, common_1.Param)('techName')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TechnologyController.prototype, "getByName", null);
 __decorate([
     (0, common_1.Get)('/:techId'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

@@ -51,6 +51,18 @@ let AuthService = class AuthService {
         this.prismaService = prismaService;
         this.jwtService = jwtService;
     }
+    async checkUsername(request) {
+        this.logger.debug(`Checking if username ${request.username} is available`);
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                username: request.username.toLowerCase(),
+            },
+        });
+        if (user) {
+            throw new common_1.HttpException('Username already exists', 400);
+        }
+        return true;
+    }
     async register(request) {
         this.logger.debug(`Registering user ${JSON.stringify(request)}`);
         const registerRequest = this.validationService.validate(auth_validation_1.AuthValidation.REGISTER, request);
@@ -82,15 +94,31 @@ let AuthService = class AuthService {
             },
         });
         if (!user) {
-            throw new common_1.HttpException('Invalid username or password', 400);
+            throw new common_1.HttpException('Invalid username or password', 401);
         }
         const passwordMatch = await bcrypt.compare(loginRequest.password, user.password);
         if (!passwordMatch) {
-            throw new common_1.HttpException('Invalid username or password', 400);
+            throw new common_1.HttpException('Invalid username or password', 401);
         }
         const token = await this.jwtService.generateToken(user);
         return {
             token: token,
+        };
+    }
+    async get(token) {
+        this.logger.debug(`Getting user info from token`);
+        const decodedUser = await this.jwtService.verifyToken(token);
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                username: decodedUser.username,
+            },
+        });
+        if (!user) {
+            throw new common_1.HttpException('User not found', 400);
+        }
+        return {
+            username: user.username,
+            name: user.name,
         };
     }
     async update(token, request) {

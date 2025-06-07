@@ -1,20 +1,22 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Project } from '@prisma/client';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { CloudinaryService } from '../common/cloudinary.service';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { JwtService } from '../jwt/jwt.service';
+import { CommonResponse } from '../model/common-response.model';
 import {
   ProjectRequest,
   ProjectResponse,
   ProjectSearchRequest,
   ProjectUpdateRequest,
 } from '../model/project.model';
-import { ProjectValidation } from './project.validation';
-import { CloudinaryService } from '../common/cloudinary.service';
-import { Project } from '@prisma/client';
 import { TechnologyService } from '../technology/technology.service';
-import { JwtService } from '../jwt/jwt.service';
-import { CommonResponse } from '../model/common-response.model';
+import { ProjectValidation } from './project.validation';
+import { fromZonedTime } from 'date-fns-tz';
+import moment from 'moment-timezone';
 
 @Injectable()
 export class ProjectService {
@@ -27,6 +29,8 @@ export class ProjectService {
     private jwtService: JwtService,
   ) {}
 
+  dateNow = moment().tz(process.env.APP_TIMEZONE).toDate();
+
   async create(
     token: string,
     request: ProjectRequest,
@@ -34,7 +38,11 @@ export class ProjectService {
     this.logger.debug(
       `Creating project with data ${JSON.stringify(request.name)}`,
     );
+    console.log('DAteNOW', this.dateNow);
 
+    request.technologies = Array.isArray(request.technologies)
+      ? request.technologies
+      : request.technologies.split(',');
     const createRequest: ProjectRequest = this.validationService.validate(
       ProjectValidation.CREATE,
       request,
@@ -66,6 +74,9 @@ export class ProjectService {
         data: {
           name: createRequest.name,
           description: createRequest.description,
+          link: createRequest.link,
+          created_at: this.dateNow,
+          updated_at: this.dateNow,
           project_image: {
             create: {
               url: image.secure_url,
@@ -90,6 +101,7 @@ export class ProjectService {
     const project = await this.prismaService.project.findFirst({
       where: {
         id: id,
+        is_active: true,
       },
       include: {
         project_image: true,
@@ -125,6 +137,12 @@ export class ProjectService {
       `Updating project with data ${JSON.stringify(request.name)}`,
     );
 
+    if (request.technologies) {
+      request.technologies = Array.isArray(request.technologies)
+        ? request.technologies
+        : request.technologies.split(',');
+    }
+
     const updateRequest: ProjectUpdateRequest = this.validationService.validate(
       ProjectValidation.UPDATE,
       request,
@@ -142,6 +160,10 @@ export class ProjectService {
     }
 
     const project = await this.checkProjectMustExist(updateRequest.id);
+    if (userId !== project.user_id) {
+      throw new HttpException('Unauthorized', 401);
+    }
+
     const image = await this.prismaService.projectImage.findFirst({
       where: {
         project_id: project.id,
@@ -149,21 +171,55 @@ export class ProjectService {
     });
     let imageUrl = image.url;
 
-    if (request.image !== undefined) {
+    if (updateRequest.image !== undefined) {
       const image = await this.cloudinaryService.uploadImage(request.image);
       imageUrl = image.secure_url;
     }
 
     let techIds = [];
-    for (const techId of updateRequest.technologies) {
-      const tech = await this.technologyService.get(techId);
-      if (tech) {
-        techIds.push(tech.id);
+    if (updateRequest.technologies !== undefined) {
+      for (const techId of updateRequest.technologies) {
+        const tech = await this.technologyService.get(techId);
+        if (tech) {
+          techIds.push(tech.id);
+        }
       }
     }
 
     const updatedProject = await this.prismaService.$transaction(
       async (prisma) => {
+        if (techIds.length > 0) {
+          await prisma.projectTechnology.deleteMany({
+            where: {
+              project_id: updateRequest.id,
+            },
+          });
+
+          await prisma.projectTechnology.createMany({
+            data: techIds.map((id) => {
+              return {
+                technology_id: id,
+                project_id: updateRequest.id,
+              };
+            }),
+          });
+        }
+
+        if (updateRequest.image !== undefined) {
+          await prisma.projectImage.deleteMany({
+            where: {
+              project_id: updateRequest.id,
+            },
+          });
+
+          await prisma.projectImage.create({
+            data: {
+              url: imageUrl,
+              project_id: updateRequest.id,
+            },
+          });
+        }
+
         return prisma.project.update({
           where: {
             id: updateRequest.id,
@@ -171,24 +227,8 @@ export class ProjectService {
           data: {
             name: updateRequest.name,
             description: updateRequest.description,
-            project_technology: {
-              deleteMany: {
-                project_id: updateRequest.id,
-              },
-              create: techIds.map((id) => {
-                return {
-                  technology_id: id,
-                };
-              }),
-            },
-            project_image: {
-              deleteMany: {
-                project_id: updateRequest.id,
-              },
-              create: {
-                url: imageUrl,
-              },
-            },
+            link: updateRequest.link,
+            updated_at: this.dateNow,
           },
         });
       },
@@ -207,7 +247,20 @@ export class ProjectService {
       request,
     );
 
+    return await this.searchProjects(searchRequest);
+  }
+
+  private async searchProjects(
+    searchRequest: ProjectSearchRequest,
+    userId?: string,
+  ): Promise<CommonResponse<ProjectResponse[]>> {
     const filters = [];
+
+    if (userId) {
+      filters.push({
+        user_id: userId,
+      });
+    }
 
     if (searchRequest.name) {
       filters.push({
@@ -220,8 +273,8 @@ export class ProjectService {
 
     if (searchRequest.techs && searchRequest.techs.length > 0) {
       let techIds = [];
-      for (const techId of searchRequest.techs) {
-        const tech = await this.technologyService.getByName(techId);
+      for (const techName of searchRequest.techs) {
+        const tech = await this.technologyService.getByName(techName);
         if (tech) {
           techIds.push(tech.id);
         }
@@ -242,7 +295,11 @@ export class ProjectService {
 
     const projects = await this.prismaService.project.findMany({
       where: {
+        is_active: searchRequest.isActive ?? true,
         AND: filters,
+      },
+      orderBy: {
+        updated_at: 'desc',
       },
       include: {
         project_image: true,
@@ -259,6 +316,7 @@ export class ProjectService {
 
     const total = await this.prismaService.project.count({
       where: {
+        is_active: searchRequest.isActive ?? true,
         AND: filters,
       },
     });
@@ -280,6 +338,31 @@ export class ProjectService {
     };
   }
 
+  async getProjectsPerUser(
+    token: string,
+    request: ProjectSearchRequest,
+  ): Promise<CommonResponse<ProjectResponse[]>> {
+    this.logger.debug(`Search projects per current user`);
+
+    const searchRequest: ProjectSearchRequest = this.validationService.validate(
+      ProjectValidation.SEARCH,
+      request,
+    );
+
+    const { userId } = await this.jwtService.verifyToken(token);
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    return await this.searchProjects(searchRequest, userId);
+  }
+
   async toProjectResponse(project: Project): Promise<ProjectResponse> {
     const technologies = await this.prismaService.technology.findMany({
       where: {
@@ -296,6 +379,7 @@ export class ProjectService {
         project_id: project.id,
       },
     });
+    const imageUrl = image?.url ?? 'https://placehold.co/600x400';
 
     const user = await this.prismaService.user.findFirst({
       where: {
@@ -307,8 +391,9 @@ export class ProjectService {
       id: project.id,
       name: project.name,
       description: project.description,
+      link: project.link,
       technologies: technologies.map((technology) => technology.name),
-      imageUrl: image.url,
+      imageUrl: imageUrl,
       userResponse: {
         username: user.username,
         name: user.name,
@@ -316,5 +401,69 @@ export class ProjectService {
       createdAt: project.created_at,
       updatedAt: project.updated_at,
     };
+  }
+
+  async delete(token: string, id: string): Promise<Boolean> {
+    this.logger.debug(`Deleting project ${id}`);
+
+    const { userId } = await this.jwtService.verifyToken(token);
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    const project = await this.checkProjectMustExist(id);
+    if (userId !== project.user_id) {
+      throw new HttpException('Unauthorized', 401);
+    }
+
+    await this.prismaService.project.update({
+      where: {
+        id: id,
+      },
+      data: {
+        is_active: false,
+        updated_at: this.dateNow,
+      },
+    });
+
+    return true;
+  }
+
+  async reactivate(token: string, id: string): Promise<ProjectResponse> {
+    this.logger.debug(`Reactivating project ${id}`);
+
+    const { userId } = await this.jwtService.verifyToken(token);
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    const project = await this.checkProjectMustExist(id);
+    if (userId !== project.user_id) {
+      throw new HttpException('Unauthorized', 401);
+    }
+
+    const reactivatedProject = await this.prismaService.project.update({
+      where: {
+        id: id,
+      },
+      data: {
+        is_active: true,
+        updated_at: this.dateNow,
+      },
+    });
+
+    return await this.toProjectResponse(reactivatedProject);
   }
 }

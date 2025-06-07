@@ -4,6 +4,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { PrismaService } from '../common/prisma.service';
 import {
+  CheckUsernameRequest,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -22,6 +23,22 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
   ) {}
+
+  async checkUsername(request: CheckUsernameRequest): Promise<boolean> {
+    this.logger.debug(`Checking if username ${request.username} is available`);
+
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        username: request.username.toLowerCase(),
+      },
+    });
+
+    if (user) {
+      throw new HttpException('Username already exists', 400);
+    }
+
+    return true;
+  }
 
   async register(request: RegisterRequest): Promise<UserResponse> {
     this.logger.debug(`Registering user ${JSON.stringify(request)}`);
@@ -71,20 +88,41 @@ export class AuthService {
       },
     });
     if (!user) {
-      throw new HttpException('Invalid username or password', 400);
+      throw new HttpException('Invalid username or password', 401);
     }
     const passwordMatch = await bcrypt.compare(
       loginRequest.password,
       user.password,
     );
     if (!passwordMatch) {
-      throw new HttpException('Invalid username or password', 400);
+      throw new HttpException('Invalid username or password', 401);
     }
 
     const token = await this.jwtService.generateToken(user);
 
     return {
       token: token,
+    };
+  }
+
+  async get(token: string): Promise<UserResponse> {
+    this.logger.debug(`Getting user info from token`);
+
+    const decodedUser = await this.jwtService.verifyToken(token);
+
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        username: decodedUser.username,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 400);
+    }
+
+    return {
+      username: user.username,
+      name: user.name,
     };
   }
 

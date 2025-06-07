@@ -6,6 +6,9 @@ export declare class ProjectController {
     constructor(projectService: ProjectService);
     create(token: string, request: ProjectRequest, image: Express.Multer.File): Promise<CommonResponse<ProjectResponse>>;
     update(token: string, request: ProjectUpdateRequest, image: Express.Multer.File): Promise<CommonResponse<ProjectResponse>>;
+    searchPerUser(token: string, name?: string, techs?: any, page?: number, size?: number): Promise<CommonResponse<ProjectResponse[]>>;
     get(projectId: string): Promise<CommonResponse<ProjectResponse>>;
     search(name?: string, techs?: any, page?: number, size?: number): Promise<CommonResponse<ProjectResponse[]>>;
+    delete(token: string, projectId: string): Promise<CommonResponse<Boolean>>;
+    reactivate(token: string, projectId: string): Promise<CommonResponse<ProjectResponse>>;
 }

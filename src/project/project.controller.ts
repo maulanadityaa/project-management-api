@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   HttpCode,
@@ -8,6 +9,7 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -76,16 +78,8 @@ export class ProjectController {
     )
     image: Express.Multer.File,
   ): Promise<CommonResponse<ProjectResponse>> {
-    const projectData: ProjectRequest = {
-      name: request.name,
-      description: request.description,
-      technologies: Array.isArray(request.technologies)
-        ? request.technologies
-        : request.technologies.split(','),
-      image: image,
-    };
-
-    const result = await this.projectService.create(token, projectData);
+    request.image = image;
+    const result = await this.projectService.create(token, request);
 
     return {
       statusCode: 201,
@@ -129,23 +123,36 @@ export class ProjectController {
     )
     image: Express.Multer.File,
   ): Promise<CommonResponse<ProjectResponse>> {
-    const projectData: ProjectUpdateRequest = {
-      id: request.id,
-      name: request.name,
-      description: request.description,
-      technologies: Array.isArray(request.technologies)
-        ? request.technologies
-        : request.technologies.split(','),
-      image: image,
-    };
-
-    const result = await this.projectService.update(token, projectData);
+    request.image = image;
+    const result = await this.projectService.update(token, request);
 
     return {
       statusCode: 200,
       message: 'Project updated',
       data: result,
     };
+  }
+
+  @Get('/search-per-user')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Search projects per user' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Projects found' })
+  @ApiBearerAuth()
+  async searchPerUser(
+    @Auth() token: string,
+    @Query('name') name?: string,
+    @Query('techs') techs?: any,
+    @Query('page') page: number = 1,
+    @Query('size') size: number = 10,
+  ): Promise<CommonResponse<ProjectResponse[]>> {
+    const request: ProjectSearchRequest = {
+      name: name,
+      techs: Array.isArray(techs) ? techs : techs?.split(','),
+      page: parseInt(String(page)) || 1,
+      size: parseInt(String(size)) || 10,
+    };
+
+    return await this.projectService.getProjectsPerUser(token, request);
   }
 
   @Get('/:projectId')
@@ -211,5 +218,57 @@ export class ProjectController {
     };
 
     return await this.projectService.search(request);
+  }
+
+  @Delete('/:projectId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Delete a project',
+    description:
+      'This endpoint requires a valid access token for authorization.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Project delete',
+    type: Boolean,
+  })
+  @ApiBearerAuth()
+  async delete(
+    @Auth() token: string,
+    @Param('projectId') projectId: string,
+  ): Promise<CommonResponse<Boolean>> {
+    const result = await this.projectService.delete(token, projectId);
+
+    return {
+      statusCode: 200,
+      message: 'Project deleted',
+      data: result,
+    };
+  }
+
+  @Patch('/:projectId/reactivate')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Reactivate a project',
+    description:
+      'This endpoint requires a valid access token for authorization.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Project reactivated',
+    type: ProjectResponse,
+  })
+  @ApiBearerAuth()
+  async reactivate(
+    @Auth() token: string,
+    @Param('projectId') projectId: string,
+  ): Promise<CommonResponse<ProjectResponse>> {
+    const result = await this.projectService.reactivate(token, projectId);
+
+    return {
+      statusCode: 200,
+      message: 'Project reactivated',
+      data: result,
+    };
   }
 }

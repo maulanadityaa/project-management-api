@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthModule } from './jwt/jwt.module';
 import { TechnologyModule } from './technology/technology.module';
 import { ProjectModule } from './project/project.module';
+import { SwaggerModule } from './swagger/swagger.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ProjectModule } from './project/project.module';
     JwtAuthModule,
     TechnologyModule,
     ProjectModule,
+    SwaggerModule,
   ],
   controllers: [],
   providers: [],

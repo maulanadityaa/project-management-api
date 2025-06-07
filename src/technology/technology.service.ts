@@ -26,6 +26,9 @@ export class TechnologyService {
           equals: techName,
           mode: 'insensitive',
         },
+        AND: {
+          is_active: true
+        }
       },
     });
 
@@ -40,8 +43,12 @@ export class TechnologyService {
     const tech = await this.prismaService.technology.findUnique({
       where: {
         id: techId,
+        AND: {
+          is_active: true
+        }
       },
     });
+    console.log(`Checking if technology with id ${techId} exists:`, tech);
 
     if (!tech) {
       throw new HttpException(`Technology with id: ${techId} not found`, 404);
@@ -98,9 +105,12 @@ export class TechnologyService {
 
     let technology = await this.checkTechMustExists(id);
 
-    technology = await this.prismaService.technology.delete({
+    technology = await this.prismaService.technology.update({
       where: {
-        id,
+        id: id,
+      },
+      data: {
+        is_active: false,
       },
     });
 
@@ -127,7 +137,7 @@ export class TechnologyService {
     const technology = await this.prismaService.technology.findFirst({
       where: {
         name: {
-          equals: name,
+          contains: name,
           mode: 'insensitive',
         },
       },
@@ -146,7 +156,11 @@ export class TechnologyService {
   async list(): Promise<TechResponse[]> {
     this.logger.debug(`Listing technologies`);
 
-    const technologies = await this.prismaService.technology.findMany();
+    const technologies = await this.prismaService.technology.findMany({
+      where: {
+        is_active: true,
+      }
+    });
 
     return technologies.map((technology) => ({
       id: technology.id,

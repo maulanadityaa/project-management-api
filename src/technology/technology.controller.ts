@@ -79,6 +79,27 @@ export class TechnologyController {
     };
   }
 
+  @Get('/name/:techName')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get a technology by name' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Technology retrieved',
+    type: TechResponse,
+  })
+  @ApiParam({ name: 'techName', type: String, example: 'React' })
+  async getByName(
+    @Param('techName') techName: string,
+  ): Promise<CommonResponse<TechResponse>> {
+    const result = await this.technologyService.getByName(techName);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Technology retrieved',
+      data: result,
+    };
+  }
+
   @Get('/:techId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a technology' })

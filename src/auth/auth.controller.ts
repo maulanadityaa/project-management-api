@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller,
+  Controller, Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
+  CheckUsernameRequest,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -27,6 +28,27 @@ import {
 @Controller('/api/v1/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('check-username')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Check if username is available' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Username is available',
+    type: Boolean,
+  })
+  @ApiBody({ type: CheckUsernameRequest })
+  async checkUsername(
+    @Body() request: CheckUsernameRequest,
+  ): Promise<CommonResponse<boolean>> {
+    const result = await this.authService.checkUsername(request);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Username is available',
+      data: result,
+    };
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
@@ -65,6 +87,29 @@ export class AuthController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Login successful',
+      data: result,
+    };
+  }
+
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get current user information',
+    description:
+      'This endpoint requires a valid access token for authorization.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Current user information',
+    type: UserResponse,
+  })
+  @ApiBearerAuth()
+  async me(@Auth() token: string): Promise<CommonResponse<UserResponse>> {
+    const result = await this.authService.get(token);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Current user information',
       data: result,
     };
   }

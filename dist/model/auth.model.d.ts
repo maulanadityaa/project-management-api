@@ -1,3 +1,6 @@
+export declare class CheckUsernameRequest {
+    username: string;
+}
 export declare class RegisterRequest {
     username: string;
     name: string;

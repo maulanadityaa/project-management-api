@@ -4,8 +4,8 @@ import { TestService } from "./test.service";
 import { Test, TestingModule } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
 import { TestModule } from "./test.module";
-import { WINSTON_MODULE_PROVIDER } from "nest-winston";
-import * as request from "supertest";
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import request from 'supertest';
 
 describe('TechnologyController', () => {
   let app: INestApplication;
@@ -34,7 +34,6 @@ describe('TechnologyController', () => {
 
     it('should be rejected if request is invalid', async () => {
       const token = await testService.getToken();
-      console.log(token);
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
@@ -43,6 +42,8 @@ describe('TechnologyController', () => {
           name: '',
           description: '',
           image: '',
+          link: '',
+          technologies: [],
         });
 
       expect(response.status).toBe(400);
@@ -59,6 +60,7 @@ describe('TechnologyController', () => {
         .set('Authorization', `Bearer ${token}`)
         .field('name', 'test project')
         .field('description', 'test description')
+        .field('link', 'https://test.com')
         .field('technologies', [tech.id])
         .attach('image', image)
 
@@ -72,13 +74,13 @@ describe('TechnologyController', () => {
 
     it('should be rejected if user is not authenticated', async () => {
       const tech = await testService.getTech();
-      const image = await testService.getNewImageFile()
 
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${''}`)
         .field('name', 'test project')
         .field('description', 'test description')
+        .field('link', 'https://test.com')
         .field('technologies', [tech.id])
 
       expect(response.status).toBe(401);
@@ -106,6 +108,10 @@ describe('TechnologyController', () => {
         .send({
           id: '1',
           name: '',
+          description: '',
+          image: '',
+          link: '',
+          technologies: [],
         });
 
       expect(response.status).toBe(400);
@@ -124,10 +130,9 @@ describe('TechnologyController', () => {
         .field('id', project.id)
         .field('name', 'updated project')
         .field('description', 'updated description')
+        .field('link', 'https://test.com')
         .field('technologies', [tech.id])
         .attach('image', image)
-
-      console.log(response.body);
 
       expect(response.status).toBe(200);
       expect(response.body.data.name).toBe('updated project');
@@ -146,9 +151,8 @@ describe('TechnologyController', () => {
         .field('id', project.id)
         .field('name', 'test project')
         .field('description', 'test description')
+        .field('link', 'https://test.com')
         .field('technologies[]', tech.id)
-
-      console.log(response.body);
 
       expect(response.status).toBe(401);
       expect(response.body.errors).toBeDefined();
