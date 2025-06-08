@@ -22,5 +22,5 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "buildCommand": "prisma generate && npm run build"
+  "buildCommand": "prisma generate && npm install --legacy-peer-deps && npm run build"
 }
