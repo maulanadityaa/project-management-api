@@ -17,12 +17,15 @@ datasource db {
 model User {
   id         String   @id @default(uuid())
   username   String   @unique
+  email      String?  @unique
   name       String?
   password   String
+  is_confirmed  Boolean  @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   projects Project[]
+  email_codes EmailCode[]
 
   @@map("mst_user")
 }
@@ -79,4 +82,18 @@ model ProjectImage {
   project Project @relation(fields: [project_id], references: [id])
 
   @@map("mst_project_image")
+}
+
+model EmailCode {
+  id         String   @id @default(uuid())
+  code       String
+  is_used    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  expired_at DateTime @default(now())
+  user_id    String
+
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@map("mst_email_code")
 }

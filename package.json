@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^3.1.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
@@ -38,8 +39,11 @@
     "moment-timezone": "^0.6.0",
     "multer": "^1.4.5-lts.1",
     "nest-winston": "^1.9.7",
+    "nodemailer": "^7.0.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pug": "^3.0.3",
+    "pug-loader": "^2.4.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "streamifier": "^0.1.1",

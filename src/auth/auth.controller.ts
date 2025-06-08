@@ -1,16 +1,19 @@
 import {
   Body,
-  Controller, Get,
+  Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   CheckUsernameRequest,
   LoginRequest,
   LoginResponse,
+  RegisterConfirmationRequest,
   RegisterRequest,
   UserResponse,
   UserUpdateRequest,
@@ -66,6 +69,56 @@ export class AuthController {
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User registered',
+      data: result,
+    };
+  }
+
+  @Get('confirm')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Confirm user registration' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User registration confirmed',
+    type: UserResponse,
+  })
+  async confirm(
+    @Query('token') token: string,
+    @Query('username') username: string,
+    @Query('uid') uid: string,
+  ): Promise<CommonResponse<UserResponse>> {
+    const request: RegisterConfirmationRequest = {
+      token,
+      username,
+      uid,
+    };
+
+    const result = await this.authService.confirmSignup(request);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User registration confirmed',
+      data: result,
+    };
+  }
+
+  @Post('send-confirmation-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send confirmation email' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Confirmation email sent',
+  })
+  async sendConfirmationEmail(
+    @Body() request: { username: string; uid: string },
+  ): Promise<CommonResponse<string>> {
+    const result = await this.authService.sendConfirmationLink(
+      request.username,
+      request.uid,
+    );
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Confirmation email sent',
       data: result,
     };
   }
@@ -133,7 +186,6 @@ export class AuthController {
     @Auth() token: string,
     @Body() request: UserUpdateRequest,
   ): Promise<CommonResponse<UserResponse>> {
-    console.log(token);
     const result = await this.authService.update(token, request);
 
     return {

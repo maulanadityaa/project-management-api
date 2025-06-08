@@ -14,6 +14,7 @@ const jwt_module_1 = require("./jwt/jwt.module");
 const technology_module_1 = require("./technology/technology.module");
 const project_module_1 = require("./project/project.module");
 const swagger_module_1 = require("./swagger/swagger.module");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,6 +27,7 @@ exports.AppModule = AppModule = __decorate([
             technology_module_1.TechnologyModule,
             project_module_1.ProjectModule,
             swagger_module_1.SwaggerModule,
+            mail_module_1.MailModule,
         ],
         controllers: [],
         providers: [],

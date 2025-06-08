@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DecodedUser = exports.LoginResponse = exports.UserResponse = exports.UserUpdateRequest = exports.LoginRequest = exports.RegisterRequest = exports.CheckUsernameRequest = void 0;
+exports.DecodedUser = exports.LoginResponse = exports.RegisterResponse = exports.UserResponse = exports.UserUpdateRequest = exports.LoginRequest = exports.RegisterConfirmationRequest = exports.RegisterRequest = exports.CheckUsernameRequest = void 0;
 const swagger_1 = require("@nestjs/swagger");
 class CheckUsernameRequest {
 }
@@ -26,6 +26,10 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterRequest.prototype, "username", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'email@example.com', description: 'Email' }),
+    __metadata("design:type", String)
+], RegisterRequest.prototype, "email", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_name', description: 'Name' }),
     __metadata("design:type", String)
 ], RegisterRequest.prototype, "name", void 0);
@@ -33,6 +37,21 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_password', description: 'Password' }),
     __metadata("design:type", String)
 ], RegisterRequest.prototype, "password", void 0);
+class RegisterConfirmationRequest {
+}
+exports.RegisterConfirmationRequest = RegisterConfirmationRequest;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'validToken', description: 'Token' }),
+    __metadata("design:type", String)
+], RegisterConfirmationRequest.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
+    __metadata("design:type", String)
+], RegisterConfirmationRequest.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    __metadata("design:type", String)
+], RegisterConfirmationRequest.prototype, "uid", void 0);
 class LoginRequest {
 }
 exports.LoginRequest = LoginRequest;
@@ -69,6 +88,21 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_name', description: 'Name' }),
     __metadata("design:type", String)
 ], UserResponse.prototype, "name", void 0);
+class RegisterResponse {
+}
+exports.RegisterResponse = RegisterResponse;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
+    __metadata("design:type", String)
+], RegisterResponse.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'test_name', description: 'Name' }),
+    __metadata("design:type", String)
+], RegisterResponse.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Is Email Sent' }),
+    __metadata("design:type", Boolean)
+], RegisterResponse.prototype, "isEmailSent", void 0);
 class LoginResponse {
 }
 exports.LoginResponse = LoginResponse;

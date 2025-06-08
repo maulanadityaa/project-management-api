@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "mst_email_code" ADD COLUMN     "expired_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

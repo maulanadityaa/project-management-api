@@ -7,6 +7,7 @@ class AuthValidation {
 exports.AuthValidation = AuthValidation;
 AuthValidation.REGISTER = zod_1.z.object({
     username: zod_1.z.string().min(1).max(255),
+    email: zod_1.z.string().email().min(1).max(255),
     password: zod_1.z.string().min(1).max(255),
     name: zod_1.z.string().min(1).max(255),
 });

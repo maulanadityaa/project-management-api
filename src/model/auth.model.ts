@@ -9,11 +9,25 @@ export class RegisterRequest {
   @ApiProperty({ example: 'test_username', description: 'Username' })
   username: string;
 
+  @ApiProperty({ example: 'email@example.com', description: 'Email' })
+  email: string;
+
   @ApiProperty({ example: 'test_name', description: 'Name' })
   name: string;
 
   @ApiProperty({ example: 'test_password', description: 'Password' })
   password: string;
+}
+
+export class RegisterConfirmationRequest {
+  @ApiProperty({ example: 'validToken', description: 'Token' })
+  token: string;
+
+  @ApiProperty({ example: 'test_username', description: 'Username' })
+  username: string;
+
+  @ApiProperty({ example: 'ValidUUIDv4', description: 'User ID' })
+  uid: string;
 }
 
 export class LoginRequest {
@@ -41,6 +55,17 @@ export class UserResponse {
 
   @ApiProperty({ example: 'test_name', description: 'Name' })
   name: string;
+}
+
+export class RegisterResponse {
+  @ApiProperty({ example: 'test_username', description: 'Username' })
+  username: string;
+
+  @ApiProperty({ example: 'test_name', description: 'Name' })
+  name: string;
+
+  @ApiProperty({ example: true, description: 'Is Email Sent' })
+  isEmailSent: boolean;
 }
 
 export class LoginResponse {

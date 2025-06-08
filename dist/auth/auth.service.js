@@ -44,12 +44,14 @@ const prisma_service_1 = require("../common/prisma.service");
 const auth_validation_1 = require("./auth.validation");
 const bcrypt = __importStar(require("bcrypt"));
 const jwt_service_1 = require("../jwt/jwt.service");
+const mail_service_1 = require("../mail/mail.service");
 let AuthService = class AuthService {
-    constructor(validationService, logger, prismaService, jwtService) {
+    constructor(validationService, logger, prismaService, jwtService, mailService) {
         this.validationService = validationService;
         this.logger = logger;
         this.prismaService = prismaService;
         this.jwtService = jwtService;
+        this.mailService = mailService;
     }
     async checkUsername(request) {
         this.logger.debug(`Checking if username ${request.username} is available`);
@@ -63,25 +65,136 @@ let AuthService = class AuthService {
         }
         return true;
     }
+    async generateCode(length = 8) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
     async register(request) {
         this.logger.debug(`Registering user ${JSON.stringify(request)}`);
         const registerRequest = this.validationService.validate(auth_validation_1.AuthValidation.REGISTER, request);
         registerRequest.username = registerRequest.username.toLowerCase();
-        const existingUser = await this.prismaService.user.count({
-            where: {
-                username: registerRequest.username,
-            },
+        const existingUser = await this.prismaService.user.findUnique({
+            where: { email: registerRequest.email },
         });
-        if (existingUser !== 0) {
-            throw new common_1.HttpException('Username already registered', 400);
+        if (existingUser) {
+            throw new common_1.HttpException('Email already in use', 400);
         }
         registerRequest.password = await bcrypt.hash(registerRequest.password, 10);
-        const user = await this.prismaService.user.create({
-            data: registerRequest,
+        const createdUser = await this.prismaService.$transaction(async (prisma) => {
+            const user = await prisma.user.create({
+                data: registerRequest,
+            });
+            const emailCode = await prisma.emailCode.create({
+                data: {
+                    code: await this.generateCode(),
+                    expired_at: new Date(Date.now() + 5 * 60 * 1000),
+                    user: {
+                        connect: { id: user.id },
+                    },
+                },
+            });
+            return { user, emailCode };
+        });
+        if (!createdUser) {
+            throw new common_1.HttpException('Failed to create user', 500);
+        }
+        let appUrl = process.env.APP_LOCAL_URL;
+        if (process.env.NODE_ENV === 'production') {
+            appUrl = process.env.APP_PROD_URL;
+        }
+        const mailResponse = await this.mailService.sendSignupConfirmation({
+            to: registerRequest.email,
+            token: createdUser.emailCode.code,
+            subject: 'Signup Confirmation',
+            username: createdUser.user.username,
+            link: `${appUrl}/api/v1/auth/confirm?username=${createdUser.user.username}&uid=${createdUser.user.id}&token=${createdUser.emailCode.code}`,
         });
         return {
+            username: createdUser.user.username,
+            name: createdUser.user.name,
+            isEmailSent: mailResponse.success,
+        };
+    }
+    async sendConfirmationLink(username, uid) {
+        this.logger.debug(`Sending confirmation link for user ${username} with UID ${uid}`);
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                username: username.toLowerCase(),
+                id: uid,
+            },
+        });
+        if (!user) {
+            throw new common_1.HttpException('User not found', 400);
+        }
+        const emailCode = await this.prismaService.emailCode.create({
+            data: {
+                code: await this.generateCode(),
+                expired_at: new Date(Date.now() + 5 * 60 * 1000),
+                user: {
+                    connect: { id: user.id },
+                },
+            },
+        });
+        let appUrl = process.env.APP_LOCAL_URL;
+        if (process.env.NODE_ENV === 'production') {
+            appUrl = process.env.APP_PROD_URL;
+        }
+        const mailResponse = await this.mailService.sendSignupConfirmation({
+            to: user.email,
+            token: emailCode.code,
+            subject: 'Signup Confirmation',
             username: user.username,
-            name: user.name,
+            link: `${appUrl}/api/v1/auth/confirm?username=${user.username}&uid=${user.id}&token=${emailCode.code}`,
+        });
+        return `${appUrl}/api/v1/auth/confirm?username=${user.username}&uid=${user.id}&token=${emailCode.code}`;
+    }
+    async confirmSignup(request) {
+        this.logger.debug(`Confirming signup for user ${JSON.stringify(request)}`);
+        const user = await this.prismaService.user.findUnique({
+            where: {
+                username: request.username.toLowerCase(),
+                id: request.uid,
+            },
+        });
+        if (!user) {
+            throw new common_1.HttpException('User not found', 400);
+        }
+        const emailCode = await this.prismaService.emailCode.findFirst({
+            where: {
+                code: request.token,
+                user_id: user.id,
+            },
+        });
+        if (!emailCode) {
+            throw new common_1.HttpException('Invalid confirmation token', 400);
+        }
+        if (emailCode.is_used) {
+            throw new common_1.HttpException('Token already used', 400);
+        }
+        if (emailCode.expired_at < new Date()) {
+            throw new common_1.HttpException('Token expired', 400);
+        }
+        const confirmedUser = await this.prismaService.$transaction(async (prisma) => {
+            const userToConfirm = await prisma.user.update({
+                where: { id: user.id },
+                data: { is_confirmed: true },
+            });
+            await this.prismaService.emailCode.update({
+                where: { id: emailCode.id },
+                data: { is_used: true },
+            });
+            return userToConfirm;
+        });
+        if (!confirmedUser) {
+            throw new common_1.HttpException('Failed to confirm user', 500);
+        }
+        return {
+            username: confirmedUser.username,
+            name: confirmedUser.name,
         };
     }
     async login(request) {
@@ -99,6 +212,9 @@ let AuthService = class AuthService {
         const passwordMatch = await bcrypt.compare(loginRequest.password, user.password);
         if (!passwordMatch) {
             throw new common_1.HttpException('Invalid username or password', 401);
+        }
+        if (!user.is_confirmed) {
+            throw new common_1.HttpException('User is not confirmed', 403);
         }
         const token = await this.jwtService.generateToken(user);
         return {
@@ -155,6 +271,7 @@ exports.AuthService = AuthService = __decorate([
     __metadata("design:paramtypes", [validation_service_1.ValidationService,
         winston_1.Logger,
         prisma_service_1.PrismaService,
-        jwt_service_1.JwtService])
+        jwt_service_1.JwtService,
+        mail_service_1.MailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map
