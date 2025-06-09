@@ -34,7 +34,8 @@ export class MailService {
         template: 'signup-email-confirmation',
         context: {
           name: mailRequest.username,
-          confirmationLink: mailRequest.link,
+          token: mailRequest.token,
+          year: new Date().getFullYear(),
         },
       });
 

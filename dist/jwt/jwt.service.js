@@ -21,6 +21,7 @@ let JwtService = class JwtService {
             userId: userInfo.id,
             username: userInfo.username,
             name: userInfo.name,
+            isConfirmed: userInfo.is_confirmed,
         };
         return this.jwtService.sign(payload);
     }

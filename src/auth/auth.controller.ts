@@ -85,7 +85,7 @@ export class AuthController {
     @Query('token') token: string,
     @Query('username') username: string,
     @Query('uid') uid: string,
-  ): Promise<CommonResponse<UserResponse>> {
+  ): Promise<CommonResponse<LoginResponse>> {
     const request: RegisterConfirmationRequest = {
       token,
       username,

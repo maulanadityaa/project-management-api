@@ -114,7 +114,9 @@ let AuthService = class AuthService {
             link: `${appUrl}/api/v1/auth/confirm?username=${createdUser.user.username}&uid=${createdUser.user.id}&token=${createdUser.emailCode.code}`,
         });
         return {
+            uid: createdUser.user.id,
             username: createdUser.user.username,
+            email: createdUser.user.email,
             name: createdUser.user.name,
             isEmailSent: mailResponse.success,
         };
@@ -167,6 +169,7 @@ let AuthService = class AuthService {
             where: {
                 code: request.token,
                 user_id: user.id,
+                is_used: false,
             },
         });
         if (!emailCode) {
@@ -192,9 +195,9 @@ let AuthService = class AuthService {
         if (!confirmedUser) {
             throw new common_1.HttpException('Failed to confirm user', 500);
         }
+        const token = await this.jwtService.generateToken(confirmedUser);
         return {
-            username: confirmedUser.username,
-            name: confirmedUser.name,
+            token: token,
         };
     }
     async login(request) {
@@ -214,7 +217,15 @@ let AuthService = class AuthService {
             throw new common_1.HttpException('Invalid username or password', 401);
         }
         if (!user.is_confirmed) {
-            throw new common_1.HttpException('User is not confirmed', 403);
+            const token = await this.jwtService.generateToken(user);
+            throw new common_1.HttpException({
+                message: 'User is not confirmed. Please check your email for confirmation link.',
+                username: user.username,
+                email: user.email,
+                name: user.name,
+                uid: user.id,
+                token: token,
+            }, 403);
         }
         const token = await this.jwtService.generateToken(user);
         return {

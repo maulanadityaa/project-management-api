@@ -37,7 +37,8 @@ let MailService = class MailService {
                 template: 'signup-email-confirmation',
                 context: {
                     name: mailRequest.username,
-                    confirmationLink: mailRequest.link,
+                    token: mailRequest.token,
+                    year: new Date().getFullYear(),
                 },
             });
             this.logger.info(`Signup confirmation email sent successfully to ${mailRequest.to}`);

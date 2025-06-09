@@ -25,7 +25,9 @@ export declare class UserResponse {
     name: string;
 }
 export declare class RegisterResponse {
+    uid: string;
     username: string;
+    email: string;
     name: string;
     isEmailSent: boolean;
 }

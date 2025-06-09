@@ -110,7 +110,9 @@ export class AuthService {
     });
 
     return {
+      uid: createdUser.user.id,
       username: createdUser.user.username,
+      email: createdUser.user.email,
       name: createdUser.user.name,
       isEmailSent: mailResponse.success,
     };
@@ -160,7 +162,7 @@ export class AuthService {
 
   async confirmSignup(
     request: RegisterConfirmationRequest,
-  ): Promise<UserResponse> {
+  ): Promise<LoginResponse> {
     this.logger.debug(`Confirming signup for user ${JSON.stringify(request)}`);
 
     const user = await this.prismaService.user.findUnique({
@@ -178,6 +180,7 @@ export class AuthService {
       where: {
         code: request.token,
         user_id: user.id,
+        is_used: false,
       },
     });
     if (!emailCode) {
@@ -209,9 +212,10 @@ export class AuthService {
       throw new HttpException('Failed to confirm user', 500);
     }
 
+    const token = await this.jwtService.generateToken(confirmedUser);
+
     return {
-      username: confirmedUser.username,
-      name: confirmedUser.name,
+      token: token,
     };
   }
 
@@ -242,7 +246,25 @@ export class AuthService {
     }
 
     if (!user.is_confirmed) {
-      throw new HttpException('User is not confirmed', 403);
+      // return {
+      //   username: user.username,
+      //   email: user.email,
+      //   name: user.name,
+      // };
+      const token = await this.jwtService.generateToken(user);
+
+      throw new HttpException(
+        {
+          message:
+            'User is not confirmed. Please check your email for confirmation link.',
+          username: user.username,
+          email: user.email,
+          name: user.name,
+          uid: user.id,
+          token: token,
+        },
+        403,
+      );
     }
 
     const token = await this.jwtService.generateToken(user);

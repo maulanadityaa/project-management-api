@@ -15,7 +15,7 @@ export declare class AuthService {
     generateCode(length?: number): Promise<string>;
     register(request: RegisterRequest): Promise<RegisterResponse>;
     sendConfirmationLink(username: string, uid: string): Promise<string>;
-    confirmSignup(request: RegisterConfirmationRequest): Promise<UserResponse>;
+    confirmSignup(request: RegisterConfirmationRequest): Promise<LoginResponse>;
     login(request: LoginRequest): Promise<LoginResponse>;
     get(token: string): Promise<UserResponse>;
     update(token: string, request: UserUpdateRequest): Promise<UserResponse>;

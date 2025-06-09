@@ -9,7 +9,7 @@ async function bootstrap() {
     const logger = app.get(nest_winston_1.WINSTON_MODULE_NEST_PROVIDER);
     app.useLogger(logger);
     app.enableCors({
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: process.env.CORS_ORIGIN.split(',') || '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         allowedHeaders: 'Content-Type, Accept, Authorization',
         credentials: true,

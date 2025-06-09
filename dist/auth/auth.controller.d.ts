@@ -6,7 +6,7 @@ export declare class AuthController {
     constructor(authService: AuthService);
     checkUsername(request: CheckUsernameRequest): Promise<CommonResponse<boolean>>;
     register(request: RegisterRequest): Promise<CommonResponse<UserResponse>>;
-    confirm(token: string, username: string, uid: string): Promise<CommonResponse<UserResponse>>;
+    confirm(token: string, username: string, uid: string): Promise<CommonResponse<LoginResponse>>;
     sendConfirmationEmail(request: {
         username: string;
         uid: string;

@@ -92,9 +92,17 @@ class RegisterResponse {
 }
 exports.RegisterResponse = RegisterResponse;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    __metadata("design:type", String)
+], RegisterResponse.prototype, "uid", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
     __metadata("design:type", String)
 ], RegisterResponse.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'email@example.com', description: 'Email' }),
+    __metadata("design:type", String)
+], RegisterResponse.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_name', description: 'Name' }),
     __metadata("design:type", String)

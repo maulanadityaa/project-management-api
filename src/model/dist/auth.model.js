@@ -93,8 +93,14 @@ var RegisterResponse = /** @class */ (function () {
     function RegisterResponse() {
     }
     __decorate([
+        swagger_1.ApiProperty({ example: 'ValidUUIDv4', description: 'User ID' })
+    ], RegisterResponse.prototype, "uid");
+    __decorate([
         swagger_1.ApiProperty({ example: 'test_username', description: 'Username' })
     ], RegisterResponse.prototype, "username");
+    __decorate([
+        swagger_1.ApiProperty({ example: 'email@example.com', description: 'Email' })
+    ], RegisterResponse.prototype, "email");
     __decorate([
         swagger_1.ApiProperty({ example: 'test_name', description: 'Name' })
     ], RegisterResponse.prototype, "name");

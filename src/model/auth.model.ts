@@ -58,8 +58,14 @@ export class UserResponse {
 }
 
 export class RegisterResponse {
+  @ApiProperty({ example: 'ValidUUIDv4', description: 'User ID' })
+  uid: string;
+
   @ApiProperty({ example: 'test_username', description: 'Username' })
   username: string;
+
+  @ApiProperty({ example: 'email@example.com', description: 'Email' })
+  email: string;
 
   @ApiProperty({ example: 'test_name', description: 'Name' })
   name: string;
