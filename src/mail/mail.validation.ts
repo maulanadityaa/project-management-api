@@ -13,8 +13,12 @@ export class MailValidation {
     token: z.string(),
     username: z.string().min(1).max(255),
     link: z.string().url(),
-    subject: z.string().min(1).max(255).optional(),
-    text: z.string().min(1).max(1000).optional(),
-    html: z.string().min(1).max(1000).optional(),
+  });
+
+  static readonly PASSWORD_RESET: ZodType = z.object({
+    to: z.string().email(),
+    token: z.string(),
+    username: z.string().min(1).max(255),
+    link: z.string().url(),
   });
 }

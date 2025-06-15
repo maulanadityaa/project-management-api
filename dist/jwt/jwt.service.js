@@ -21,7 +21,7 @@ let JwtService = class JwtService {
             userId: userInfo.id,
             username: userInfo.username,
             name: userInfo.name,
-            isConfirmed: userInfo.is_confirmed,
+            email: userInfo.email,
         };
         return this.jwtService.sign(payload);
     }
@@ -30,6 +30,29 @@ let JwtService = class JwtService {
             return this.jwtService.verify(token, {
                 secret: process.env.JWT_SECRET,
             });
+        }
+        catch (error) {
+            throw new common_1.HttpException('Invalid token', 401);
+        }
+    }
+    async verifyTokenWithoutExpiration(token) {
+        try {
+            return this.jwtService.verify(token, {
+                secret: process.env.JWT_SECRET,
+                ignoreExpiration: true,
+            });
+        }
+        catch (error) {
+            throw new common_1.HttpException('Invalid token', 401);
+        }
+    }
+    async refreshToken(token, userInfo) {
+        try {
+            this.jwtService.verify(token, {
+                secret: process.env.JWT_SECRET,
+                ignoreExpiration: true,
+            });
+            return this.generateToken(userInfo);
         }
         catch (error) {
             throw new common_1.HttpException('Invalid token', 401);

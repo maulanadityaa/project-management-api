@@ -56,7 +56,7 @@ var JwtService = /** @class */ (function () {
                     userId: userInfo.id,
                     username: userInfo.username,
                     name: userInfo.name,
-                    isConfirmed: userInfo.is_confirmed
+                    email: userInfo.email
                 };
                 return [2 /*return*/, this.jwtService.sign(payload)];
             });
@@ -69,6 +69,39 @@ var JwtService = /** @class */ (function () {
                     return [2 /*return*/, this.jwtService.verify(token, {
                             secret: process.env.JWT_SECRET
                         })];
+                }
+                catch (error) {
+                    throw new common_1.HttpException('Invalid token', 401);
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    JwtService.prototype.verifyTokenWithoutExpiration = function (token) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                try {
+                    return [2 /*return*/, this.jwtService.verify(token, {
+                            secret: process.env.JWT_SECRET,
+                            ignoreExpiration: true
+                        })];
+                }
+                catch (error) {
+                    throw new common_1.HttpException('Invalid token', 401);
+                }
+                return [2 /*return*/];
+            });
+        });
+    };
+    JwtService.prototype.refreshToken = function (token, userInfo) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                try {
+                    this.jwtService.verify(token, {
+                        secret: process.env.JWT_SECRET,
+                        ignoreExpiration: true
+                    });
+                    return [2 /*return*/, this.generateToken(userInfo)];
                 }
                 catch (error) {
                     throw new common_1.HttpException('Invalid token', 401);

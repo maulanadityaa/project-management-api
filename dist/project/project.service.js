@@ -317,6 +317,8 @@ let ProjectService = class ProjectService {
             technologies: technologies.map((technology) => technology.name),
             imageUrl: imageUrl,
             userResponse: {
+                uid: user.id,
+                email: user.email,
                 username: user.username,
                 name: user.name,
             },

@@ -1,85 +1,222 @@
+# Project Management API 🎯
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://img.shields.io/badge/TypeScript-blue?style=flat-square" alt="TypeScript Badge" />
+  <img src="https://img.shields.io/badge/Node.js-green?style=flat-square&logo=node.js&logoColor=white" alt="Node.js Badge" />
+  <img src="https://img.shields.io/badge/NestJS-red?style=flat-square&logo=nestjs&logoColor=white" alt="NestJS Badge" />
+  <img src="https://img.shields.io/badge/Prisma-blueviolet?style=flat-square&logo=prisma&logoColor=white" alt="Prisma Badge" />
+  <!-- <img src="https://img.shields.io/badge/Supabase-brightgreen?style=flat-square&logo=supabase&logoColor=white" alt="Supabase Badge" /> -->
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A robust and scalable RESTful API built using **TypeScript**, **Node.js**, and **NestJS** for managing projects, tasks, and user roles. Designed with modern best practices, this API provides a flexible backend foundation for project management applications.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 📚 Table of Contents
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [Project Management API 🎯](#project-management-api-)
+  - [📚 Table of Contents](#-table-of-contents)
+  - [✨ Key Features](#-key-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [🚀 Getting Started](#-getting-started)
+  - [⚙️ Environment Variables](#️-environment-variables)
+  - [📦 API Endpoints](#-api-endpoints)
+  - [📨 Sample Requests \& Responses](#-sample-requests--responses)
+    - [✅ Register](#-register)
+    - [🔐 Login](#-login)
+    - [📁 Create Project](#-create-project)
+  - [🤝 Contribution Guide](#-contribution-guide)
 
-## Project setup
+---
+
+## ✨ Key Features
+
+- 🔐 **Authentication & Authorization**  
+  Secure endpoints using JWT. Only authorized users can access protected resources.
+
+- 🗂️ **Task Management**  
+  Create, assign, and track tasks with status and priority control.
+
+- 💾 **Database Integration with Prisma**  
+  Leverage Prisma for database access and type-safe queries.
+
+- 📚 **API Documentation**  
+  Full Swagger documentation available at:  
+  👉 **[Live Swagger Docs](https://project-management-api-cyan.vercel.app/api/v1/docs)**
+
+---
+
+## 🛠️ Tech Stack
+
+| Tech       | Description                         |
+| ---------- | ----------------------------------- |
+| TypeScript | Typed superset of JavaScript        |
+| NestJS     | Scalable Node.js framework          |
+| Prisma     | Next-gen ORM for TypeScript/Node.js |
+| Supabase   | Optional DB                         |
+| PostgreSQL | Primary database                    |
+| Swagger    | API documentation                   |
+
+---
+
+## 🚀 Getting Started
 
 ```bash
-$ npm install
+# 1. Clone the repository
+git clone https://github.com/maulanadityaa/project-management-api
+
+# 2. Enter the project directory
+cd project-management-api
+
+# 3. Install dependencies
+npm install
+
+# 4. Copy the example environment file
+cp .env.example .env
+
+# 5. Run the app in development mode
+npm run start:dev
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## ⚙️ Environment Variables
 
-# watch mode
-$ npm run start:dev
+Create a `.env` file in the root directory with the following structure:
 
-# production mode
-$ npm run start:prod
+```env
+# Application
+PORT=3000
+NODE_ENV=development
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=1d
+
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://user:password@localhost:5432/project_management_db
+
+# Supabase
+SUPABASE_URL=https://your-supabase-url.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Swagger
+SWAGGER_API_TITLE=Project Management API
+SWAGGER_API_DESCRIPTION=REST API documentation for managing projects and tasks
+SWAGGER_API_VERSION=1.0
 ```
 
-## Run tests
+Update values as needed to match your local or production environment.
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+## 📦 API Endpoints
 
-# test coverage
-$ npm run test:cov
+| Method | Endpoint                   | Description          |
+| ------ | -------------------------- | -------------------- |
+| POST   | `/api/v1/auth/login`       | Login user           |
+| POST   | `/api/v1/auth/register`    | Register new user    |
+| GET    | `/api/v1/projects`         | List all projects    |
+| POST   | `/api/v1/projects`         | Create a new project |
+| GET    | `/api/v1/projects/:id`     | Get project details  |
+| PUT    | `/api/v1/projects/:id`     | Update project       |
+| DELETE | `/api/v1/projects/:id`     | Delete project       |
+| GET    | `/api/v1/tasks`            | List tasks           |
+| POST   | `/api/v1/tasks`            | Create task          |
+| PUT    | `/api/v1/tasks/:id/status` | Update task status   |
+
+---
+
+## 📨 Sample Requests & Responses
+
+### ✅ Register
+
+```http
+POST /api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com",
+  "password": "secure123"
+}
 ```
 
-## Resources
+**Response:**
 
-Check out a few resources that may come in handy when working with NestJS:
+```json
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": "uuid",
+    "email": "johndoe@example.com"
+  }
+}
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+### 🔐 Login
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```http
+POST /auth/login
+Content-Type: application/json
 
-## Stay in touch
+{
+  "email": "johndoe@example.com",
+  "password": "secure123"
+}
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**Response:**
 
-## License
+```json
+{
+  "token": "jwt.token.here"
+}
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+### 📁 Create Project
+
+```http
+POST /projects
+Authorization: Bearer jwt.token.here
+Content-Type: application/json
+
+{
+  "name": "New Feature Development",
+  "description": "Work on new payment integration feature"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "project-uuid",
+  "name": "New Feature Development",
+  "description": "Work on new payment integration feature",
+  "createdAt": "2025-06-11T12:00:00.000Z"
+}
+```
+
+---
+
+## 🤝 Contribution Guide
+
+1. **Fork** the repo
+2. **Create a new branch**
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add feature'
+   ```
+4. **Push your branch**
+   ```bash
+   git push origin feature/your-feature
+   ```
+5. **Submit a Pull Request**
+
+We welcome contributions! Please ensure your code adheres to the project's coding standards and includes tests where applicable.

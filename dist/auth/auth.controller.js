@@ -18,6 +18,7 @@ const auth_service_1 = require("./auth.service");
 const auth_model_1 = require("../model/auth.model");
 const auth_decorator_1 = require("../common/auth.decorator");
 const swagger_1 = require("@nestjs/swagger");
+const zod_1 = require("zod");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -38,9 +39,9 @@ let AuthController = class AuthController {
             data: result,
         };
     }
-    async confirm(token, username, uid) {
+    async confirm(code, username, uid) {
         const request = {
-            token,
+            code,
             username,
             uid,
         };
@@ -51,11 +52,19 @@ let AuthController = class AuthController {
             data: result,
         };
     }
-    async sendConfirmationEmail(request) {
-        const result = await this.authService.sendConfirmationLink(request.username, request.uid);
+    async sendConfirmationEmail(request, token) {
+        const result = await this.authService.resendAccountConfirmation(request, token);
         return {
             statusCode: common_1.HttpStatus.OK,
             message: 'Confirmation email sent',
+            data: result,
+        };
+    }
+    async sendPasswordResetEmail(request, token) {
+        const result = await this.authService.sendPasswordReset(request, token);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: 'Password reset email sent',
             data: result,
         };
     }
@@ -75,11 +84,35 @@ let AuthController = class AuthController {
             data: result,
         };
     }
+    async confirmTokenResetPassword(request, token) {
+        const result = await this.authService.confirmResetPassword(request, token);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: 'Code confirmed for password reset',
+            data: result,
+        };
+    }
     async update(token, request) {
         const result = await this.authService.update(token, request);
         return {
             statusCode: common_1.HttpStatus.OK,
             message: 'User updated',
+            data: result,
+        };
+    }
+    async forgotPassword(request) {
+        const result = await this.authService.sendEmailForgotPassword(request);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: 'Password reset email sent',
+            data: result,
+        };
+    }
+    async refreshToken(token) {
+        const result = await this.authService.refreshJwtToken(token);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: 'Access token refreshed',
             data: result,
         };
     }
@@ -106,7 +139,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.CREATED,
         description: 'User registered',
-        type: auth_model_1.UserResponse,
+        type: auth_model_1.RegisterResponse,
     }),
     (0, swagger_1.ApiBody)({ type: auth_model_1.RegisterRequest }),
     __param(0, (0, common_1.Body)()),
@@ -123,7 +156,7 @@ __decorate([
         description: 'User registration confirmed',
         type: auth_model_1.UserResponse,
     }),
-    __param(0, (0, common_1.Query)('token')),
+    __param(0, (0, common_1.Query)('code')),
     __param(1, (0, common_1.Query)('username')),
     __param(2, (0, common_1.Query)('uid')),
     __metadata("design:type", Function),
@@ -133,16 +166,41 @@ __decorate([
 __decorate([
     (0, common_1.Post)('send-confirmation-email'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiOperation)({ summary: 'Send confirmation email' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Send confirmation email',
+        description: 'This endpoint requires a valid access token for authorization.',
+    }),
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.OK,
         description: 'Confirmation email sent',
     }),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.UserMailRequest }),
+    (0, swagger_1.ApiBearerAuth)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, auth_decorator_1.Auth)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [auth_model_1.UserMailRequest, String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "sendConfirmationEmail", null);
+__decorate([
+    (0, common_1.Post)('send-password-reset-email'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Send password reset email',
+        description: 'This endpoint requires a valid access token for authorization.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Password reset email sent',
+    }),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.UserMailRequest }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, auth_decorator_1.Auth)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_model_1.UserMailRequest, String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "sendPasswordResetEmail", null);
 __decorate([
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -177,6 +235,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "me", null);
 __decorate([
+    (0, common_1.Post)('confirm-token-reset-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Confirm token for password reset',
+        description: 'This endpoint requires a valid access token for authorization.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Token confirmed for password reset',
+        type: zod_1.boolean,
+    }),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.PasswordResetRequest }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, auth_decorator_1.Auth)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_model_1.PasswordResetRequest, String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "confirmTokenResetPassword", null);
+__decorate([
     (0, common_1.Put)('update'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({
@@ -197,6 +275,42 @@ __decorate([
     __metadata("design:paramtypes", [String, auth_model_1.UserUpdateRequest]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "update", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Request password reset',
+        description: 'This endpoint allows users to request a password reset email.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Password reset email sent',
+        type: auth_model_1.UserForgotPasswordResponse,
+    }),
+    (0, swagger_1.ApiBody)({ type: auth_model_1.UserForgotPasswordRequest }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_model_1.UserForgotPasswordRequest]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('refresh-token'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Refresh access token',
+        description: 'This endpoint allows users to refresh their access token using a valid refresh token.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: common_1.HttpStatus.OK,
+        description: 'Access token refreshed',
+        type: auth_model_1.LoginResponse,
+    }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, auth_decorator_1.Auth)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refreshToken", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('/api/v1/auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

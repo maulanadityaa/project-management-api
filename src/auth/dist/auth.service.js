@@ -60,14 +60,15 @@ var AuthService = /** @class */ (function () {
     }
     AuthService.prototype.checkUsername = function (request) {
         return __awaiter(this, void 0, Promise, function () {
-            var user;
+            var checkRequest, user;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.logger.debug("Checking if username " + request.username + " is available");
+                        checkRequest = this.validationService.validate(auth_validation_1.AuthValidation.USERNAME_CHECK, request);
                         return [4 /*yield*/, this.prismaService.user.findUnique({
                                 where: {
-                                    username: request.username.toLowerCase()
+                                    username: checkRequest.username.toLowerCase()
                                 }
                             })];
                     case 1:
@@ -96,7 +97,7 @@ var AuthService = /** @class */ (function () {
     };
     AuthService.prototype.register = function (request) {
         return __awaiter(this, void 0, Promise, function () {
-            var registerRequest, existingUser, _a, createdUser, appUrl, mailResponse;
+            var registerRequest, existingEmail, _a, createdUser, appUrl, mailResponse, token;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -108,13 +109,16 @@ var AuthService = /** @class */ (function () {
                                 where: { email: registerRequest.email }
                             })];
                     case 1:
-                        existingUser = _b.sent();
-                        if (existingUser) {
-                            throw new common_1.HttpException('Email already in use', 400);
+                        existingEmail = _b.sent();
+                        if (existingEmail) {
+                            throw new common_1.HttpException('Email already exists', 400);
                         }
+                        return [4 /*yield*/, this.checkUsername({ username: registerRequest.username })];
+                    case 2:
+                        _b.sent();
                         _a = registerRequest;
                         return [4 /*yield*/, bcrypt.hash(registerRequest.password, 10)];
-                    case 2:
+                    case 3:
                         _a.password = _b.sent();
                         return [4 /*yield*/, this.prismaService.$transaction(function (prisma) { return __awaiter(_this, void 0, void 0, function () {
                                 var user, emailCode, _a, _b, _c, _d;
@@ -142,7 +146,7 @@ var AuthService = /** @class */ (function () {
                                     }
                                 });
                             }); })];
-                    case 3:
+                    case 4:
                         createdUser = _b.sent();
                         if (!createdUser) {
                             throw new common_1.HttpException('Failed to create user', 500);
@@ -154,37 +158,46 @@ var AuthService = /** @class */ (function () {
                         return [4 /*yield*/, this.mailService.sendSignupConfirmation({
                                 to: registerRequest.email,
                                 token: createdUser.emailCode.code,
-                                subject: 'Signup Confirmation',
                                 username: createdUser.user.username,
                                 link: appUrl + "/api/v1/auth/confirm?username=" + createdUser.user.username + "&uid=" + createdUser.user.id + "&token=" + createdUser.emailCode.code
                             })];
-                    case 4:
+                    case 5:
                         mailResponse = _b.sent();
+                        return [4 /*yield*/, this.jwtService.generateToken(createdUser.user)];
+                    case 6:
+                        token = _b.sent();
                         return [2 /*return*/, {
-                                uid: createdUser.user.id,
-                                username: createdUser.user.username,
-                                email: createdUser.user.email,
-                                name: createdUser.user.name,
+                                token: token,
                                 isEmailSent: mailResponse.success
                             }];
                 }
             });
         });
     };
-    AuthService.prototype.sendConfirmationLink = function (username, uid) {
+    AuthService.prototype.resendAccountConfirmation = function (request, token) {
         return __awaiter(this, void 0, Promise, function () {
-            var user, emailCode, _a, _b, _c, _d, appUrl, mailResponse;
+            var mailRequest, userData, user, emailCode, _a, _b, _c, _d, appUrl, mailResponse;
             return __generator(this, function (_e) {
                 switch (_e.label) {
                     case 0:
-                        this.logger.debug("Sending confirmation link for user " + username + " with UID " + uid);
-                        return [4 /*yield*/, this.prismaService.user.findUnique({
+                        this.logger.debug("Resending account confirmation email for user " + JSON.stringify(request));
+                        mailRequest = this.validationService.validate(auth_validation_1.AuthValidation.USER_MAIL, request);
+                        return [4 /*yield*/, this.jwtService.verifyToken(token)];
+                    case 1:
+                        userData = _e.sent();
+                        console.log("Token verified for user " + mailRequest.username + " with UID " + mailRequest.uid);
+                        if (userData.username.toLowerCase() !== mailRequest.username.toLowerCase()) {
+                            throw new common_1.HttpException('Invalid token for this user', 400);
+                        }
+                        return [4 /*yield*/, this.prismaService.user.findFirst({
                                 where: {
-                                    username: username.toLowerCase(),
-                                    id: uid
+                                    AND: [
+                                        { username: mailRequest.username.toLowerCase() },
+                                        { id: mailRequest.uid },
+                                    ]
                                 }
                             })];
-                    case 1:
+                    case 2:
                         user = _e.sent();
                         if (!user) {
                             throw new common_1.HttpException('User not found', 400);
@@ -193,45 +206,48 @@ var AuthService = /** @class */ (function () {
                         _c = {};
                         _d = {};
                         return [4 /*yield*/, this.generateCode()];
-                    case 2: return [4 /*yield*/, _b.apply(_a, [(_c.data = (_d.code = _e.sent(),
+                    case 3: return [4 /*yield*/, _b.apply(_a, [(_c.data = (_d.code = _e.sent(),
                                 _d.expired_at = new Date(Date.now() + 5 * 60 * 1000),
                                 _d.user = {
                                     connect: { id: user.id }
                                 },
                                 _d),
                                 _c)])];
-                    case 3:
+                    case 4:
                         emailCode = _e.sent();
                         appUrl = process.env.APP_LOCAL_URL;
                         if (process.env.NODE_ENV === 'production') {
                             appUrl = process.env.APP_PROD_URL;
                         }
-                        return [4 /*yield*/, this.mailService.sendSignupConfirmation({
+                        return [4 /*yield*/, this.mailService.resendAccountConfirmation({
                                 to: user.email,
                                 token: emailCode.code,
-                                subject: 'Signup Confirmation',
                                 username: user.username,
                                 link: appUrl + "/api/v1/auth/confirm?username=" + user.username + "&uid=" + user.id + "&token=" + emailCode.code
                             })];
-                    case 4:
+                    case 5:
                         mailResponse = _e.sent();
-                        return [2 /*return*/, appUrl + "/api/v1/auth/confirm?username=" + user.username + "&uid=" + user.id + "&token=" + emailCode.code];
+                        return [2 /*return*/, {
+                                success: mailResponse.success,
+                                message: mailResponse.message
+                            }];
                 }
             });
         });
     };
     AuthService.prototype.confirmSignup = function (request) {
         return __awaiter(this, void 0, Promise, function () {
-            var user, emailCode, confirmedUser, token;
+            var confirmationRequest, user, emailCode, confirmedUser, token;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.logger.debug("Confirming signup for user " + JSON.stringify(request));
+                        confirmationRequest = this.validationService.validate(auth_validation_1.AuthValidation.TOKEN_CONFIRMATION, request);
                         return [4 /*yield*/, this.prismaService.user.findUnique({
                                 where: {
-                                    username: request.username.toLowerCase(),
-                                    id: request.uid
+                                    username: confirmationRequest.username.toLowerCase(),
+                                    id: confirmationRequest.uid
                                 }
                             })];
                     case 1:
@@ -241,7 +257,7 @@ var AuthService = /** @class */ (function () {
                         }
                         return [4 /*yield*/, this.prismaService.emailCode.findFirst({
                                 where: {
-                                    code: request.token,
+                                    code: confirmationRequest.code,
                                     user_id: user.id,
                                     is_used: false
                                 }
@@ -249,7 +265,7 @@ var AuthService = /** @class */ (function () {
                     case 2:
                         emailCode = _a.sent();
                         if (!emailCode) {
-                            throw new common_1.HttpException('Invalid confirmation token', 400);
+                            throw new common_1.HttpException('Token is invalid', 400);
                         }
                         if (emailCode.is_used) {
                             throw new common_1.HttpException('Token already used', 400);
@@ -294,7 +310,7 @@ var AuthService = /** @class */ (function () {
     };
     AuthService.prototype.login = function (request) {
         return __awaiter(this, void 0, Promise, function () {
-            var loginRequest, user, passwordMatch, token_1, token;
+            var loginRequest, user, passwordMatch, token;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -317,21 +333,15 @@ var AuthService = /** @class */ (function () {
                         if (!passwordMatch) {
                             throw new common_1.HttpException('Invalid username or password', 401);
                         }
-                        if (!!user.is_confirmed) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.jwtService.generateToken(user)];
                     case 3:
-                        token_1 = _a.sent();
-                        throw new common_1.HttpException({
-                            message: 'User is not confirmed. Please check your email for confirmation link.',
-                            username: user.username,
-                            email: user.email,
-                            name: user.name,
-                            uid: user.id,
-                            token: token_1
-                        }, 403);
-                    case 4: return [4 /*yield*/, this.jwtService.generateToken(user)];
-                    case 5:
                         token = _a.sent();
+                        if (!user.is_confirmed) {
+                            return [2 /*return*/, {
+                                    token: token,
+                                    isConfirmed: user.is_confirmed
+                                }];
+                        }
                         return [2 /*return*/, {
                                 token: token
                             }];
@@ -360,6 +370,8 @@ var AuthService = /** @class */ (function () {
                             throw new common_1.HttpException('User not found', 400);
                         }
                         return [2 /*return*/, {
+                                uid: user.id,
+                                email: user.email,
                                 username: user.username,
                                 name: user.name
                             }];
@@ -369,7 +381,7 @@ var AuthService = /** @class */ (function () {
     };
     AuthService.prototype.update = function (token, request) {
         return __awaiter(this, void 0, Promise, function () {
-            var updateRequest, decodedUser, user, _a, updatedUser;
+            var updateRequest, decodedUser, user, checkMailCode, _a, updatedUser;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -378,8 +390,12 @@ var AuthService = /** @class */ (function () {
                         return [4 /*yield*/, this.jwtService.verifyToken(token)];
                     case 1:
                         decodedUser = _b.sent();
+                        if (updateRequest.uid !== decodedUser.userId) {
+                            throw new common_1.HttpException('Invalid user ID in token or request', 400);
+                        }
                         return [4 /*yield*/, this.prismaService.user.findUnique({
                                 where: {
+                                    id: decodedUser.uid,
                                     username: decodedUser.username
                                 }
                             })];
@@ -388,23 +404,242 @@ var AuthService = /** @class */ (function () {
                         if (!user) {
                             throw new common_1.HttpException('User not found', 400);
                         }
-                        if (!updateRequest.password) return [3 /*break*/, 4];
+                        if (!updateRequest.password) return [3 /*break*/, 5];
+                        console.log("Updating password for user " + decodedUser.username + " with UID " + user.id + " and code " + updateRequest.code);
+                        if (updateRequest.code === undefined) {
+                            throw new common_1.HttpException('Code is required for password reset', 400);
+                        }
+                        return [4 /*yield*/, this.prismaService.emailCode.findMany({
+                                where: {
+                                    user_id: user.id,
+                                    code: updateRequest.code,
+                                    is_used: true
+                                }
+                            })];
+                    case 3:
+                        checkMailCode = _b.sent();
+                        if (!checkMailCode) {
+                            throw new common_1.HttpException('Invalid token for password reset', 400);
+                        }
                         _a = updateRequest;
                         return [4 /*yield*/, bcrypt.hash(updateRequest.password, 10)];
-                    case 3:
+                    case 4:
                         _a.password = _b.sent();
-                        _b.label = 4;
-                    case 4: return [4 /*yield*/, this.prismaService.user.update({
+                        _b.label = 5;
+                    case 5: return [4 /*yield*/, this.prismaService.user.update({
                             where: {
-                                username: decodedUser.username
+                                username: decodedUser.username,
+                                id: decodedUser.userId
                             },
-                            data: updateRequest
+                            data: {
+                                name: updateRequest.name,
+                                password: updateRequest.password
+                            }
                         })];
-                    case 5:
+                    case 6:
                         updatedUser = _b.sent();
                         return [2 /*return*/, {
+                                uid: updatedUser.id,
+                                email: updatedUser.email,
                                 username: updatedUser.username,
                                 name: updatedUser.name
+                            }];
+                }
+            });
+        });
+    };
+    AuthService.prototype.sendPasswordReset = function (request, token) {
+        return __awaiter(this, void 0, Promise, function () {
+            var mailRequest, user, emailCode, _a, _b, _c, _d, appUrl, mailResponse;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        this.logger.debug("Sending password reset link for user " + request.username + " with UID " + request.uid);
+                        mailRequest = this.validationService.validate(auth_validation_1.AuthValidation.USER_MAIL, request);
+                        return [4 /*yield*/, this.jwtService.verifyToken(token)];
+                    case 1:
+                        _e.sent();
+                        console.log("Token verified for user " + mailRequest.username + " with UID " + mailRequest.uid);
+                        if (mailRequest.username.toLowerCase() !== mailRequest.username.toLowerCase()) {
+                            throw new common_1.HttpException('Invalid token for this user', 400);
+                        }
+                        return [4 /*yield*/, this.prismaService.user.findFirst({
+                                where: {
+                                    AND: [
+                                        { username: mailRequest.username.toLowerCase() },
+                                        { id: mailRequest.uid },
+                                        {
+                                            email: mailRequest.email
+                                                ? mailRequest.email.toLowerCase()
+                                                : undefined
+                                        },
+                                    ]
+                                }
+                            })];
+                    case 2:
+                        user = _e.sent();
+                        if (!user) {
+                            throw new common_1.HttpException('User not found', 400);
+                        }
+                        _b = (_a = this.prismaService.emailCode).create;
+                        _c = {};
+                        _d = {};
+                        return [4 /*yield*/, this.generateCode()];
+                    case 3: return [4 /*yield*/, _b.apply(_a, [(_c.data = (_d.code = _e.sent(),
+                                _d.expired_at = new Date(Date.now() + 5 * 60 * 1000),
+                                _d.user = {
+                                    connect: { id: user.id }
+                                },
+                                _d),
+                                _c)])];
+                    case 4:
+                        emailCode = _e.sent();
+                        appUrl = process.env.APP_LOCAL_URL;
+                        if (process.env.NODE_ENV === 'production') {
+                            appUrl = process.env.APP_PROD_URL;
+                        }
+                        return [4 /*yield*/, this.mailService.sendPasswordReset({
+                                to: user.email,
+                                token: emailCode.code,
+                                username: user.username,
+                                link: appUrl + "/api/v1/auth/reset-password?username=" + user.username + "&uid=" + user.id + "&token=" + emailCode.code
+                            })];
+                    case 5:
+                        mailResponse = _e.sent();
+                        return [2 /*return*/, {
+                                success: mailResponse.success,
+                                message: mailResponse.message
+                            }];
+                }
+            });
+        });
+    };
+    AuthService.prototype.confirmResetPassword = function (request, token) {
+        return __awaiter(this, void 0, Promise, function () {
+            var resetRequest, user, emailCode;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.logger.debug("Confirming password reset for user " + JSON.stringify(request));
+                        resetRequest = this.validationService.validate(auth_validation_1.AuthValidation.TOKEN_CONFIRMATION, request);
+                        return [4 /*yield*/, this.jwtService.verifyToken(token)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.prismaService.user.findUnique({
+                                where: {
+                                    username: resetRequest.username.toLowerCase(),
+                                    id: resetRequest.uid
+                                }
+                            })];
+                    case 2:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.HttpException('User not found', 400);
+                        }
+                        return [4 /*yield*/, this.prismaService.emailCode.findFirst({
+                                where: {
+                                    code: resetRequest.code,
+                                    user_id: user.id,
+                                    is_used: false
+                                }
+                            })];
+                    case 3:
+                        emailCode = _a.sent();
+                        if (!emailCode) {
+                            throw new common_1.HttpException('Token is invalid', 400);
+                        }
+                        if (emailCode.is_used) {
+                            throw new common_1.HttpException('Token already used', 400);
+                        }
+                        if (emailCode.expired_at < new Date()) {
+                            throw new common_1.HttpException('Token expired', 400);
+                        }
+                        return [2 /*return*/, true];
+                }
+            });
+        });
+    };
+    AuthService.prototype.sendEmailForgotPassword = function (request) {
+        return __awaiter(this, void 0, Promise, function () {
+            var mailRequest, user, emailCode, _a, _b, _c, _d, appUrl, mailResponse, token;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        this.logger.debug("Sending email for password reset for user " + JSON.stringify(request));
+                        mailRequest = this.validationService.validate(auth_validation_1.AuthValidation.FORGOT_PASSWORD, request);
+                        return [4 /*yield*/, this.prismaService.user.findFirst({
+                                where: {
+                                    email: mailRequest.email.toLowerCase()
+                                }
+                            })];
+                    case 1:
+                        user = _e.sent();
+                        if (!user) {
+                            throw new common_1.HttpException('User not found', 400);
+                        }
+                        _b = (_a = this.prismaService.emailCode).create;
+                        _c = {};
+                        _d = {};
+                        return [4 /*yield*/, this.generateCode()];
+                    case 2: return [4 /*yield*/, _b.apply(_a, [(_c.data = (_d.code = _e.sent(),
+                                _d.expired_at = new Date(Date.now() + 5 * 60 * 1000),
+                                _d.user = {
+                                    connect: { id: user.id }
+                                },
+                                _d),
+                                _c)])];
+                    case 3:
+                        emailCode = _e.sent();
+                        appUrl = process.env.APP_LOCAL_URL;
+                        if (process.env.NODE_ENV === 'production') {
+                            appUrl = process.env.APP_PROD_URL;
+                        }
+                        return [4 /*yield*/, this.mailService.sendPasswordReset({
+                                to: user.email,
+                                token: emailCode.code,
+                                username: user.username,
+                                link: appUrl + "/api/v1/auth/reset-password?username=" + user.username + "&uid=" + user.id + "&token=" + emailCode.code
+                            })];
+                    case 4:
+                        mailResponse = _e.sent();
+                        return [4 /*yield*/, this.jwtService.generateToken(user)];
+                    case 5:
+                        token = _e.sent();
+                        return [2 /*return*/, {
+                                token: token,
+                                isEmailSent: mailResponse.success
+                            }];
+                }
+            });
+        });
+    };
+    AuthService.prototype.refreshJwtToken = function (token) {
+        return __awaiter(this, void 0, Promise, function () {
+            var decodedUser, user, newToken;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.logger.debug("Refreshing JWT token");
+                        return [4 /*yield*/, this.jwtService.verifyTokenWithoutExpiration(token)];
+                    case 1:
+                        decodedUser = _a.sent();
+                        return [4 /*yield*/, this.prismaService.user.findUnique({
+                                where: {
+                                    id: decodedUser.userId,
+                                    username: decodedUser.username
+                                }
+                            })];
+                    case 2:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new common_1.HttpException('User not found', 400);
+                        }
+                        return [4 /*yield*/, this.jwtService.refreshToken(token, user)];
+                    case 3:
+                        newToken = _a.sent();
+                        return [2 /*return*/, {
+                                token: newToken,
+                                isConfirmed: user.is_confirmed
                             }];
                 }
             });

@@ -50,6 +50,7 @@ var common_1 = require("@nestjs/common");
 var auth_model_1 = require("../model/auth.model");
 var auth_decorator_1 = require("../common/auth.decorator");
 var swagger_1 = require("@nestjs/swagger");
+var zod_1 = require("zod");
 var AuthController = /** @class */ (function () {
     function AuthController(authService) {
         this.authService = authService;
@@ -88,14 +89,14 @@ var AuthController = /** @class */ (function () {
             });
         });
     };
-    AuthController.prototype.confirm = function (token, username, uid) {
+    AuthController.prototype.confirm = function (code, username, uid) {
         return __awaiter(this, void 0, Promise, function () {
             var request, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         request = {
-                            token: token,
+                            code: code,
                             username: username,
                             uid: uid
                         };
@@ -111,17 +112,34 @@ var AuthController = /** @class */ (function () {
             });
         });
     };
-    AuthController.prototype.sendConfirmationEmail = function (request) {
+    AuthController.prototype.sendConfirmationEmail = function (request, token) {
         return __awaiter(this, void 0, Promise, function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.authService.sendConfirmationLink(request.username, request.uid)];
+                    case 0: return [4 /*yield*/, this.authService.resendAccountConfirmation(request, token)];
                     case 1:
                         result = _a.sent();
                         return [2 /*return*/, {
                                 statusCode: common_1.HttpStatus.OK,
                                 message: 'Confirmation email sent',
+                                data: result
+                            }];
+                }
+            });
+        });
+    };
+    AuthController.prototype.sendPasswordResetEmail = function (request, token) {
+        return __awaiter(this, void 0, Promise, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.authService.sendPasswordReset(request, token)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, {
+                                statusCode: common_1.HttpStatus.OK,
+                                message: 'Password reset email sent',
                                 data: result
                             }];
                 }
@@ -162,6 +180,23 @@ var AuthController = /** @class */ (function () {
             });
         });
     };
+    AuthController.prototype.confirmTokenResetPassword = function (request, token) {
+        return __awaiter(this, void 0, Promise, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.authService.confirmResetPassword(request, token)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, {
+                                statusCode: common_1.HttpStatus.OK,
+                                message: 'Code confirmed for password reset',
+                                data: result
+                            }];
+                }
+            });
+        });
+    };
     AuthController.prototype.update = function (token, request) {
         return __awaiter(this, void 0, Promise, function () {
             var result;
@@ -173,6 +208,40 @@ var AuthController = /** @class */ (function () {
                         return [2 /*return*/, {
                                 statusCode: common_1.HttpStatus.OK,
                                 message: 'User updated',
+                                data: result
+                            }];
+                }
+            });
+        });
+    };
+    AuthController.prototype.forgotPassword = function (request) {
+        return __awaiter(this, void 0, Promise, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.authService.sendEmailForgotPassword(request)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, {
+                                statusCode: common_1.HttpStatus.OK,
+                                message: 'Password reset email sent',
+                                data: result
+                            }];
+                }
+            });
+        });
+    };
+    AuthController.prototype.refreshToken = function (token) {
+        return __awaiter(this, void 0, Promise, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.authService.refreshJwtToken(token)];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, {
+                                statusCode: common_1.HttpStatus.OK,
+                                message: 'Access token refreshed',
                                 data: result
                             }];
                 }
@@ -197,7 +266,7 @@ var AuthController = /** @class */ (function () {
         swagger_1.ApiResponse({
             status: common_1.HttpStatus.CREATED,
             description: 'User registered',
-            type: auth_model_1.UserResponse
+            type: auth_model_1.RegisterResponse
         }),
         swagger_1.ApiBody({ type: auth_model_1.RegisterRequest }),
         __param(0, common_1.Body())
@@ -211,20 +280,42 @@ var AuthController = /** @class */ (function () {
             description: 'User registration confirmed',
             type: auth_model_1.UserResponse
         }),
-        __param(0, common_1.Query('token')),
+        __param(0, common_1.Query('code')),
         __param(1, common_1.Query('username')),
         __param(2, common_1.Query('uid'))
     ], AuthController.prototype, "confirm");
     __decorate([
         common_1.Post('send-confirmation-email'),
         common_1.HttpCode(common_1.HttpStatus.OK),
-        swagger_1.ApiOperation({ summary: 'Send confirmation email' }),
+        swagger_1.ApiOperation({
+            summary: 'Send confirmation email',
+            description: 'This endpoint requires a valid access token for authorization.'
+        }),
         swagger_1.ApiResponse({
             status: common_1.HttpStatus.OK,
             description: 'Confirmation email sent'
         }),
-        __param(0, common_1.Body())
+        swagger_1.ApiBody({ type: auth_model_1.UserMailRequest }),
+        swagger_1.ApiBearerAuth(),
+        __param(0, common_1.Body()),
+        __param(1, auth_decorator_1.Auth())
     ], AuthController.prototype, "sendConfirmationEmail");
+    __decorate([
+        common_1.Post('send-password-reset-email'),
+        common_1.HttpCode(common_1.HttpStatus.OK),
+        swagger_1.ApiOperation({
+            summary: 'Send password reset email',
+            description: 'This endpoint requires a valid access token for authorization.'
+        }),
+        swagger_1.ApiResponse({
+            status: common_1.HttpStatus.OK,
+            description: 'Password reset email sent'
+        }),
+        swagger_1.ApiBody({ type: auth_model_1.UserMailRequest }),
+        swagger_1.ApiBearerAuth(),
+        __param(0, common_1.Body()),
+        __param(1, auth_decorator_1.Auth())
+    ], AuthController.prototype, "sendPasswordResetEmail");
     __decorate([
         common_1.Post('login'),
         common_1.HttpCode(common_1.HttpStatus.OK),
@@ -253,6 +344,23 @@ var AuthController = /** @class */ (function () {
         __param(0, auth_decorator_1.Auth())
     ], AuthController.prototype, "me");
     __decorate([
+        common_1.Post('confirm-token-reset-password'),
+        common_1.HttpCode(common_1.HttpStatus.OK),
+        swagger_1.ApiOperation({
+            summary: 'Confirm token for password reset',
+            description: 'This endpoint requires a valid access token for authorization.'
+        }),
+        swagger_1.ApiResponse({
+            status: common_1.HttpStatus.OK,
+            description: 'Token confirmed for password reset',
+            type: zod_1.boolean
+        }),
+        swagger_1.ApiBody({ type: auth_model_1.PasswordResetRequest }),
+        swagger_1.ApiBearerAuth(),
+        __param(0, common_1.Body()),
+        __param(1, auth_decorator_1.Auth())
+    ], AuthController.prototype, "confirmTokenResetPassword");
+    __decorate([
         common_1.Put('update'),
         common_1.HttpCode(common_1.HttpStatus.OK),
         swagger_1.ApiOperation({
@@ -270,6 +378,36 @@ var AuthController = /** @class */ (function () {
         __param(0, auth_decorator_1.Auth()),
         __param(1, common_1.Body())
     ], AuthController.prototype, "update");
+    __decorate([
+        common_1.Post('forgot-password'),
+        common_1.HttpCode(common_1.HttpStatus.OK),
+        swagger_1.ApiOperation({
+            summary: 'Request password reset',
+            description: 'This endpoint allows users to request a password reset email.'
+        }),
+        swagger_1.ApiResponse({
+            status: common_1.HttpStatus.OK,
+            description: 'Password reset email sent',
+            type: auth_model_1.UserForgotPasswordResponse
+        }),
+        swagger_1.ApiBody({ type: auth_model_1.UserForgotPasswordRequest }),
+        __param(0, common_1.Body())
+    ], AuthController.prototype, "forgotPassword");
+    __decorate([
+        common_1.Post('refresh-token'),
+        common_1.HttpCode(common_1.HttpStatus.OK),
+        swagger_1.ApiOperation({
+            summary: 'Refresh access token',
+            description: 'This endpoint allows users to refresh their access token using a valid refresh token.'
+        }),
+        swagger_1.ApiResponse({
+            status: common_1.HttpStatus.OK,
+            description: 'Access token refreshed',
+            type: auth_model_1.LoginResponse
+        }),
+        swagger_1.ApiBearerAuth(),
+        __param(0, auth_decorator_1.Auth())
+    ], AuthController.prototype, "refreshToken");
     AuthController = __decorate([
         common_1.Controller('/api/v1/auth')
     ], AuthController);

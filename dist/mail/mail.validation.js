@@ -16,8 +16,11 @@ MailValidation.SIGNUP_CONFIRMATION = zod_1.z.object({
     token: zod_1.z.string(),
     username: zod_1.z.string().min(1).max(255),
     link: zod_1.z.string().url(),
-    subject: zod_1.z.string().min(1).max(255).optional(),
-    text: zod_1.z.string().min(1).max(1000).optional(),
-    html: zod_1.z.string().min(1).max(1000).optional(),
+});
+MailValidation.PASSWORD_RESET = zod_1.z.object({
+    to: zod_1.z.string().email(),
+    token: zod_1.z.string(),
+    username: zod_1.z.string().min(1).max(255),
+    link: zod_1.z.string().url(),
 });
 //# sourceMappingURL=mail.validation.js.map

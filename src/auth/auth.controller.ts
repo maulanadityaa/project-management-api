@@ -13,8 +13,13 @@ import {
   CheckUsernameRequest,
   LoginRequest,
   LoginResponse,
+  PasswordResetRequest,
   RegisterConfirmationRequest,
   RegisterRequest,
+  RegisterResponse,
+  UserForgotPasswordRequest,
+  UserForgotPasswordResponse,
+  UserMailRequest,
   UserResponse,
   UserUpdateRequest,
 } from '../model/auth.model';
@@ -27,6 +32,9 @@ import {
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { MailResponse } from 'src/model/mail.model';
+import { boolean } from 'zod';
+import { User } from '@prisma/client';
 
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -58,12 +66,12 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User registered',
-    type: UserResponse,
+    type: RegisterResponse,
   })
   @ApiBody({ type: RegisterRequest })
   async register(
     @Body() request: RegisterRequest,
-  ): Promise<CommonResponse<UserResponse>> {
+  ): Promise<CommonResponse<RegisterResponse>> {
     const result = await this.authService.register(request);
 
     return {
@@ -82,12 +90,12 @@ export class AuthController {
     type: UserResponse,
   })
   async confirm(
-    @Query('token') token: string,
+    @Query('code') code: string,
     @Query('username') username: string,
     @Query('uid') uid: string,
   ): Promise<CommonResponse<LoginResponse>> {
     const request: RegisterConfirmationRequest = {
-      token,
+      code,
       username,
       uid,
     };
@@ -103,22 +111,55 @@ export class AuthController {
 
   @Post('send-confirmation-email')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Send confirmation email' })
+  @ApiOperation({
+    summary: 'Send confirmation email',
+    description:
+      'This endpoint requires a valid access token for authorization.',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Confirmation email sent',
   })
+  @ApiBody({ type: UserMailRequest })
+  @ApiBearerAuth()
   async sendConfirmationEmail(
-    @Body() request: { username: string; uid: string },
-  ): Promise<CommonResponse<string>> {
-    const result = await this.authService.sendConfirmationLink(
-      request.username,
-      request.uid,
+    @Body() request: UserMailRequest,
+    @Auth() token: string,
+  ): Promise<CommonResponse<MailResponse>> {
+    const result = await this.authService.resendAccountConfirmation(
+      request,
+      token,
     );
 
     return {
       statusCode: HttpStatus.OK,
       message: 'Confirmation email sent',
+      data: result,
+    };
+  }
+
+  @Post('send-password-reset-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Send password reset email',
+    description:
+      'This endpoint requires a valid access token for authorization.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset email sent',
+  })
+  @ApiBody({ type: UserMailRequest })
+  @ApiBearerAuth()
+  async sendPasswordResetEmail(
+    @Body() request: UserMailRequest,
+    @Auth() token: string,
+  ): Promise<CommonResponse<MailResponse>> {
+    const result = await this.authService.sendPasswordReset(request, token);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Password reset email sent',
       data: result,
     };
   }
@@ -167,6 +208,33 @@ export class AuthController {
     };
   }
 
+  @Post('confirm-token-reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Confirm token for password reset',
+    description:
+      'This endpoint requires a valid access token for authorization.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Token confirmed for password reset',
+    type: boolean,
+  })
+  @ApiBody({ type: PasswordResetRequest })
+  @ApiBearerAuth()
+  async confirmTokenResetPassword(
+    @Body() request: PasswordResetRequest,
+    @Auth() token: string,
+  ): Promise<CommonResponse<boolean>> {
+    const result = await this.authService.confirmResetPassword(request, token);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Code confirmed for password reset',
+      data: result,
+    };
+  }
+
   @Put('update')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -191,6 +259,56 @@ export class AuthController {
     return {
       statusCode: HttpStatus.OK,
       message: 'User updated',
+      data: result,
+    };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Request password reset',
+    description:
+      'This endpoint allows users to request a password reset email.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset email sent',
+    type: UserForgotPasswordResponse,
+  })
+  @ApiBody({ type: UserForgotPasswordRequest })
+  async forgotPassword(
+    @Body() request: UserForgotPasswordRequest,
+  ): Promise<CommonResponse<UserForgotPasswordResponse>> {
+    const result = await this.authService.sendEmailForgotPassword(request);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Password reset email sent',
+      data: result,
+    };
+  }
+
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Refresh access token',
+    description:
+      'This endpoint allows users to refresh their access token using a valid refresh token.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Access token refreshed',
+    type: LoginResponse,
+  })
+  @ApiBearerAuth()
+  async refreshToken(
+    @Auth() token: string,
+  ): Promise<CommonResponse<LoginResponse>> {
+    const result = await this.authService.refreshJwtToken(token);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Access token refreshed',
       data: result,
     };
   }

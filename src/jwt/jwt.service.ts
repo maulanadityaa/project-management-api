@@ -10,7 +10,7 @@ export class JwtService {
       userId: userInfo.id,
       username: userInfo.username,
       name: userInfo.name,
-      isConfirmed: userInfo.is_confirmed,
+      email: userInfo.email,
     };
 
     return this.jwtService.sign(payload);
@@ -21,6 +21,30 @@ export class JwtService {
       return this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
+    } catch (error) {
+      throw new HttpException('Invalid token', 401);
+    }
+  }
+
+  async verifyTokenWithoutExpiration(token: string) {
+    try {
+      return this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+        ignoreExpiration: true,
+      });
+    } catch (error) {
+      throw new HttpException('Invalid token', 401);
+    }
+  }
+
+  async refreshToken(token: string, userInfo: any) {
+    try {
+      this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+        ignoreExpiration: true,
+      });
+
+      return this.generateToken(userInfo);
     } catch (error) {
       throw new HttpException('Invalid token', 401);
     }

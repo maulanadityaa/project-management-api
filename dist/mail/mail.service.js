@@ -33,7 +33,7 @@ let MailService = class MailService {
             const mailRequest = this.validationService.validate(mail_validation_1.MailValidation.SIGNUP_CONFIRMATION, request);
             await this.mailerService.sendMail({
                 to: mailRequest.to,
-                subject: mailRequest.subject,
+                subject: 'Please confirm your email address',
                 template: 'signup-email-confirmation',
                 context: {
                     name: mailRequest.username,
@@ -56,6 +56,62 @@ let MailService = class MailService {
                 where: { email: request.to },
             });
             throw new common_1.HttpException('Failed to send signup confirmation email', 500);
+        }
+    }
+    async resendAccountConfirmation(request) {
+        this.logger.debug(`Resending account confirmation email to ${request.to}`);
+        try {
+            const mailRequest = this.validationService.validate(mail_validation_1.MailValidation.SIGNUP_CONFIRMATION, request);
+            await this.mailerService.sendMail({
+                to: mailRequest.to,
+                subject: 'Please confirm your email address',
+                template: 'resend-account-confirmation',
+                context: {
+                    name: mailRequest.username,
+                    token: mailRequest.token,
+                    year: new Date().getFullYear(),
+                },
+            });
+            this.logger.info(`Account confirmation email resent successfully to ${mailRequest.to}`);
+            return {
+                success: true,
+                message: `Account confirmation email resent to ${mailRequest.to}`,
+            };
+        }
+        catch (error) {
+            this.logger.error(`Error resending account confirmation email: ${error.message}`, error);
+            await this.prismaService.emailCode.deleteMany({
+                where: { user: { email: request.to } },
+            });
+            throw new common_1.HttpException('Failed to resend account confirmation email', 500);
+        }
+    }
+    async sendPasswordReset(request) {
+        this.logger.debug(`Sending password reset email to ${request.to}`);
+        try {
+            const mailRequest = this.validationService.validate(mail_validation_1.MailValidation.PASSWORD_RESET, request);
+            await this.mailerService.sendMail({
+                to: mailRequest.to,
+                subject: 'Password Reset Request',
+                template: 'password-reset',
+                context: {
+                    name: mailRequest.username,
+                    token: mailRequest.token,
+                    year: new Date().getFullYear(),
+                },
+            });
+            this.logger.info(`Password reset email sent successfully to ${mailRequest.to}`);
+            return {
+                success: true,
+                message: `Password reset email sent to ${mailRequest.to}`,
+            };
+        }
+        catch (error) {
+            this.logger.error(`Error sending password reset email: ${error.message}`, error);
+            await this.prismaService.emailCode.deleteMany({
+                where: { user: { email: request.to } },
+            });
+            throw new common_1.HttpException('Failed to send password reset email', 500);
         }
     }
 };

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DecodedUser = exports.LoginResponse = exports.RegisterResponse = exports.UserResponse = exports.UserUpdateRequest = exports.LoginRequest = exports.RegisterConfirmationRequest = exports.RegisterRequest = exports.CheckUsernameRequest = void 0;
+exports.DecodedUser = exports.LoginResponse = exports.RegisterResponse = exports.UserForgotPasswordResponse = exports.UserResponse = exports.UserForgotPasswordRequest = exports.UserMailRequest = exports.UserUpdateRequest = exports.PasswordResetRequest = exports.LoginRequest = exports.RegisterConfirmationRequest = exports.RegisterRequest = exports.CheckUsernameRequest = void 0;
 const swagger_1 = require("@nestjs/swagger");
 class CheckUsernameRequest {
 }
@@ -41,9 +41,9 @@ class RegisterConfirmationRequest {
 }
 exports.RegisterConfirmationRequest = RegisterConfirmationRequest;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'validToken', description: 'Token' }),
+    (0, swagger_1.ApiProperty)({ example: 'validCode', description: 'Code' }),
     __metadata("design:type", String)
-], RegisterConfirmationRequest.prototype, "token", void 0);
+], RegisterConfirmationRequest.prototype, "code", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
     __metadata("design:type", String)
@@ -63,9 +63,28 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_password', description: 'Password' }),
     __metadata("design:type", String)
 ], LoginRequest.prototype, "password", void 0);
+class PasswordResetRequest {
+}
+exports.PasswordResetRequest = PasswordResetRequest;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'validCode', description: 'Code' }),
+    __metadata("design:type", String)
+], PasswordResetRequest.prototype, "code", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
+    __metadata("design:type", String)
+], PasswordResetRequest.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    __metadata("design:type", String)
+], PasswordResetRequest.prototype, "uid", void 0);
 class UserUpdateRequest {
 }
 exports.UserUpdateRequest = UserUpdateRequest;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    __metadata("design:type", String)
+], UserUpdateRequest.prototype, "uid", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'test_name', description: 'Name (optional)' }),
     __metadata("design:type", String)
@@ -77,6 +96,38 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], UserUpdateRequest.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'code',
+        description: 'Password reset code (optional -- for password reset only)',
+    }),
+    __metadata("design:type", String)
+], UserUpdateRequest.prototype, "code", void 0);
+class UserMailRequest {
+}
+exports.UserMailRequest = UserMailRequest;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'username', description: 'Username' }),
+    __metadata("design:type", String)
+], UserMailRequest.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    __metadata("design:type", String)
+], UserMailRequest.prototype, "uid", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        example: 'example@email.com',
+        description: 'Email (optional -- for send reset password only)',
+    }),
+    __metadata("design:type", String)
+], UserMailRequest.prototype, "email", void 0);
+class UserForgotPasswordRequest {
+}
+exports.UserForgotPasswordRequest = UserForgotPasswordRequest;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'example@email.com', description: 'Email' }),
+    __metadata("design:type", String)
+], UserForgotPasswordRequest.prototype, "email", void 0);
 class UserResponse {
 }
 exports.UserResponse = UserResponse;
@@ -88,25 +139,32 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'test_name', description: 'Name' }),
     __metadata("design:type", String)
 ], UserResponse.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    __metadata("design:type", String)
+], UserResponse.prototype, "uid", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'example@mail.com', description: 'Email' }),
+    __metadata("design:type", String)
+], UserResponse.prototype, "email", void 0);
+class UserForgotPasswordResponse {
+}
+exports.UserForgotPasswordResponse = UserForgotPasswordResponse;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'validJwtToken', description: 'Token' }),
+    __metadata("design:type", String)
+], UserForgotPasswordResponse.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Is Email Sent' }),
+    __metadata("design:type", Boolean)
+], UserForgotPasswordResponse.prototype, "isEmailSent", void 0);
 class RegisterResponse {
 }
 exports.RegisterResponse = RegisterResponse;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'ValidUUIDv4', description: 'User ID' }),
+    (0, swagger_1.ApiProperty)({ example: 'validJwtToken', description: 'Token' }),
     __metadata("design:type", String)
-], RegisterResponse.prototype, "uid", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'test_username', description: 'Username' }),
-    __metadata("design:type", String)
-], RegisterResponse.prototype, "username", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'email@example.com', description: 'Email' }),
-    __metadata("design:type", String)
-], RegisterResponse.prototype, "email", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: 'test_name', description: 'Name' }),
-    __metadata("design:type", String)
-], RegisterResponse.prototype, "name", void 0);
+], RegisterResponse.prototype, "token", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: true, description: 'Is Email Sent' }),
     __metadata("design:type", Boolean)
@@ -118,6 +176,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'validJwtToken', description: 'Token' }),
     __metadata("design:type", String)
 ], LoginResponse.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: true, description: 'Is User Confirmed' }),
+    __metadata("design:type", Boolean)
+], LoginResponse.prototype, "isConfirmed", void 0);
 class DecodedUser {
 }
 exports.DecodedUser = DecodedUser;

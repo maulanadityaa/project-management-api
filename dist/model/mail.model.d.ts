@@ -9,9 +9,12 @@ export declare class SignupConfirmationRequest {
     token: string;
     username: string;
     link: string;
-    subject?: string;
-    text?: string;
-    html?: string;
+}
+export declare class PasswordResetRequest {
+    to: string;
+    token: string;
+    username: string;
+    link: string;
 }
 export declare class MailResponse {
     success: boolean;

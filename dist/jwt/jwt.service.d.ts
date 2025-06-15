@@ -4,4 +4,6 @@ export declare class JwtService {
     constructor(jwtService: NestJwtService);
     generateToken(userInfo: any): Promise<string>;
     verifyToken(token: string): Promise<any>;
+    verifyTokenWithoutExpiration(token: string): Promise<any>;
+    refreshToken(token: string, userInfo: any): Promise<string>;
 }
