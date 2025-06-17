@@ -24,6 +24,6 @@ export declare class ProjectService {
     private searchProjects;
     getProjectsPerUser(token: string, request: ProjectSearchRequest): Promise<CommonResponse<ProjectResponse[]>>;
     toProjectResponse(project: Project): Promise<ProjectResponse>;
-    delete(token: string, id: string): Promise<Boolean>;
+    delete(token: string, id: string): Promise<ProjectResponse>;
     reactivate(token: string, id: string): Promise<ProjectResponse>;
 }

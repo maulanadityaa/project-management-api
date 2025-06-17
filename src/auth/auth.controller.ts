@@ -218,7 +218,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Token confirmed for password reset',
-    type: boolean,
+    type: Boolean,
   })
   @ApiBody({ type: PasswordResetRequest })
   @ApiBearerAuth()

@@ -14,7 +14,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 let SwaggerController = class SwaggerController {
     redirectSwagger() {
-        return { url: 'api/v1/docs' };
+        return { url: '/docs' };
     }
 };
 exports.SwaggerController = SwaggerController;

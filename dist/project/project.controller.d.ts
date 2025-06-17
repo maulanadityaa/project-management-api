@@ -9,6 +9,6 @@ export declare class ProjectController {
     searchPerUser(token: string, name?: string, techs?: any, page?: number, size?: number): Promise<CommonResponse<ProjectResponse[]>>;
     get(projectId: string): Promise<CommonResponse<ProjectResponse>>;
     search(name?: string, techs?: any, page?: number, size?: number): Promise<CommonResponse<ProjectResponse[]>>;
-    delete(token: string, projectId: string): Promise<CommonResponse<Boolean>>;
+    delete(token: string, projectId: string): Promise<CommonResponse<ProjectResponse>>;
     reactivate(token: string, projectId: string): Promise<CommonResponse<ProjectResponse>>;
 }

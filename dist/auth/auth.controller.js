@@ -18,7 +18,6 @@ const auth_service_1 = require("./auth.service");
 const auth_model_1 = require("../model/auth.model");
 const auth_decorator_1 = require("../common/auth.decorator");
 const swagger_1 = require("@nestjs/swagger");
-const zod_1 = require("zod");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -244,7 +243,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.OK,
         description: 'Token confirmed for password reset',
-        type: zod_1.boolean,
+        type: Boolean,
     }),
     (0, swagger_1.ApiBody)({ type: auth_model_1.PasswordResetRequest }),
     (0, swagger_1.ApiBearerAuth)(),

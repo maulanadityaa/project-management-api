@@ -229,7 +229,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: common_1.HttpStatus.OK,
         description: 'Project delete',
-        type: Boolean,
+        type: project_model_1.ProjectResponse,
     }),
     (0, swagger_1.ApiBearerAuth)(),
     __param(0, (0, auth_decorator_1.Auth)()),

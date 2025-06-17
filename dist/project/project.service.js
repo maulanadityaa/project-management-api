@@ -341,7 +341,7 @@ let ProjectService = class ProjectService {
         if (userId !== project.user_id) {
             throw new common_1.HttpException('Unauthorized', 401);
         }
-        await this.prismaService.project.update({
+        const deletedProject = await this.prismaService.project.update({
             where: {
                 id: id,
             },
@@ -350,7 +350,7 @@ let ProjectService = class ProjectService {
                 updated_at: this.dateNow,
             },
         });
-        return true;
+        return await this.toProjectResponse(deletedProject);
     }
     async reactivate(token, id) {
         this.logger.debug(`Reactivating project ${id}`);

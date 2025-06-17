@@ -7,6 +7,6 @@ export class SwaggerController {
   @Get()
   @Redirect('api/v1/docs', 302)
   redirectSwagger() {
-    return { url: 'api/v1/docs' };
+    return { url: '/docs' };
   }
 }

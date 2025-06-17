@@ -1,0 +1,1320 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/auth/check-username": {
+      "post": {
+        "operationId": "AuthController_checkUsername",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckUsernameRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Username is available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Check if username is available",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/confirm": {
+      "get": {
+        "operationId": "AuthController_confirm",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "username",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "uid",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User registration confirmed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Confirm user registration",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/send-confirmation-email": {
+      "post": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "AuthController_sendConfirmationEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserMailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Confirmation email sent"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send confirmation email",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/send-password-reset-email": {
+      "post": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "AuthController_sendPasswordResetEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserMailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset email sent"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send password reset email",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Login to the system",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current user information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user information",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/confirm-token-reset-password": {
+      "post": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "AuthController_confirmTokenResetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token confirmed for password reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirm token for password reset",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/update": {
+      "put": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "AuthController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user information",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "description": "This endpoint allows users to request a password reset email.",
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset email sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserForgotPasswordResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Request password reset",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh-token": {
+      "post": {
+        "description": "This endpoint allows users to refresh their access token using a valid refresh token.",
+        "operationId": "AuthController_refreshToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Access token refreshed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Refresh access token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/technologies": {
+      "post": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "TechnologyController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TechRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Technology created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new technology",
+        "tags": [
+          "Technology"
+        ]
+      },
+      "put": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "TechnologyController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TechUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Technology updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a technology",
+        "tags": [
+          "Technology"
+        ]
+      },
+      "get": {
+        "operationId": "TechnologyController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Technologies retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TechResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List all technologies",
+        "tags": [
+          "Technology"
+        ]
+      }
+    },
+    "/api/v1/technologies/name/{techName}": {
+      "get": {
+        "operationId": "TechnologyController_getByName",
+        "parameters": [
+          {
+            "name": "techName",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "React",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Technology retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a technology by name",
+        "tags": [
+          "Technology"
+        ]
+      }
+    },
+    "/api/v1/technologies/{techId}": {
+      "get": {
+        "operationId": "TechnologyController_get",
+        "parameters": [
+          {
+            "name": "techId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "ValidUUIDv4",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Technology retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a technology",
+        "tags": [
+          "Technology"
+        ]
+      },
+      "delete": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "TechnologyController_delete",
+        "parameters": [
+          {
+            "name": "techId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "ValidUUIDv4",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Technology deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a technology",
+        "tags": [
+          "Technology"
+        ]
+      }
+    },
+    "/api/v1/projects": {
+      "post": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "ProjectController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new project",
+        "tags": [
+          "Project"
+        ]
+      },
+      "put": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "ProjectController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project updated"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a project",
+        "tags": [
+          "Project"
+        ]
+      },
+      "get": {
+        "operationId": "ProjectController_search",
+        "parameters": [
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "description": "Project Name",
+            "schema": {
+              "example": "Project Name",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (optional) - default 1",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "size",
+            "required": false,
+            "in": "query",
+            "description": "Page size (optional) - default 10",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "techs",
+            "required": false,
+            "in": "query",
+            "description": "Array of technologies",
+            "schema": {
+              "example": [
+                "tech1",
+                "tech2"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projects found"
+          }
+        },
+        "summary": "Search projects",
+        "tags": [
+          "Project"
+        ]
+      }
+    },
+    "/api/v1/projects/search-per-user": {
+      "get": {
+        "operationId": "ProjectController_searchPerUser",
+        "parameters": [
+          {
+            "name": "name",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "size",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projects found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Search projects per user",
+        "tags": [
+          "Project"
+        ]
+      }
+    },
+    "/api/v1/projects/{projectId}": {
+      "get": {
+        "operationId": "ProjectController_get",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "description": "Project ID",
+            "schema": {
+              "example": "ValidUUIDv4",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project found"
+          }
+        },
+        "summary": "Get a project",
+        "tags": [
+          "Project"
+        ]
+      },
+      "delete": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "ProjectController_delete",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project delete",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a project",
+        "tags": [
+          "Project"
+        ]
+      }
+    },
+    "/api/v1/projects/{projectId}/reactivate": {
+      "patch": {
+        "description": "This endpoint requires a valid access token for authorization.",
+        "operationId": "ProjectController_reactivate",
+        "parameters": [
+          {
+            "name": "projectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project reactivated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reactivate a project",
+        "tags": [
+          "Project"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Project Management API",
+    "description": "Project Management API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "maulanadityaa",
+      "url": "https://github.com/maulanadityaa",
+      "email": "maulanadityaaa@gmail.com"
+    }
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3030"
+    },
+    {
+      "url": "https://project-management-api-cyan.vercel.app"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CheckUsernameRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "test_username",
+            "description": "Username"
+          }
+        },
+        "required": [
+          "username"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "test_username",
+            "description": "Username"
+          },
+          "email": {
+            "type": "string",
+            "example": "email@example.com",
+            "description": "Email"
+          },
+          "name": {
+            "type": "string",
+            "example": "test_name",
+            "description": "Name"
+          },
+          "password": {
+            "type": "string",
+            "example": "test_password",
+            "description": "Password"
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "name",
+          "password"
+        ]
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "validJwtToken",
+            "description": "Token"
+          },
+          "isEmailSent": {
+            "type": "boolean",
+            "example": true,
+            "description": "Is Email Sent"
+          }
+        },
+        "required": [
+          "token",
+          "isEmailSent"
+        ]
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "test_username",
+            "description": "Username"
+          },
+          "name": {
+            "type": "string",
+            "example": "test_name",
+            "description": "Name"
+          },
+          "uid": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "User ID"
+          },
+          "email": {
+            "type": "string",
+            "example": "example@mail.com",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "username",
+          "name",
+          "uid",
+          "email"
+        ]
+      },
+      "UserMailRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "username",
+            "description": "Username"
+          },
+          "uid": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "User ID"
+          },
+          "email": {
+            "type": "string",
+            "example": "example@email.com",
+            "description": "Email (optional -- for send reset password only)"
+          }
+        },
+        "required": [
+          "username",
+          "uid"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "test_username",
+            "description": "Username"
+          },
+          "password": {
+            "type": "string",
+            "example": "test_password",
+            "description": "Password"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "validJwtToken",
+            "description": "Token"
+          },
+          "isConfirmed": {
+            "type": "boolean",
+            "example": true,
+            "description": "Is User Confirmed"
+          }
+        },
+        "required": [
+          "token",
+          "isConfirmed"
+        ]
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "validCode",
+            "description": "Code"
+          },
+          "username": {
+            "type": "string",
+            "example": "test_username",
+            "description": "Username"
+          },
+          "uid": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "User ID"
+          }
+        },
+        "required": [
+          "code",
+          "username",
+          "uid"
+        ]
+      },
+      "UserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "User ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "test_name",
+            "description": "Name (optional)"
+          },
+          "password": {
+            "type": "string",
+            "example": "test_password",
+            "description": "Password (optional)"
+          },
+          "code": {
+            "type": "string",
+            "example": "code",
+            "description": "Password reset code (optional -- for password reset only)"
+          }
+        },
+        "required": [
+          "uid"
+        ]
+      },
+      "UserForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "example@email.com",
+            "description": "Email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "UserForgotPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "validJwtToken",
+            "description": "Token"
+          },
+          "isEmailSent": {
+            "type": "boolean",
+            "example": true,
+            "description": "Is Email Sent"
+          }
+        },
+        "required": [
+          "token",
+          "isEmailSent"
+        ]
+      },
+      "TechRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Technology Name",
+            "description": "Technology Name"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "TechResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "Technology ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "Technology Name",
+            "description": "Technology Name"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "TechUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "Technology ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "Updated Technology Name",
+            "description": "Technology Name (optional)"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ProjectRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Project Name",
+            "description": "Project Name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Project Description",
+            "description": "Project Description"
+          },
+          "link": {
+            "type": "string",
+            "example": "https://project-link.com",
+            "description": "Project Link"
+          },
+          "technologies": {
+            "type": "array",
+            "example": [
+              "tech1",
+              "tech2"
+            ],
+            "description": "Array of technologies",
+            "items": {
+              "type": "string"
+            }
+          },
+          "image": {
+            "type": "string",
+            "example": "image.jpg",
+            "description": "Project Image",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "link",
+          "technologies",
+          "image"
+        ]
+      },
+      "ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "Project ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "Project Name",
+            "description": "Project Name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Project Description",
+            "description": "Project Description"
+          },
+          "link": {
+            "type": "string",
+            "example": "https://project-link.com",
+            "description": "Project Link"
+          },
+          "technologies": {
+            "example": [
+              "tech1",
+              "tech2"
+            ],
+            "description": "Array of technologies",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "cloudinary-secure-url",
+            "description": "Project Image"
+          },
+          "userResponse": {
+            "description": "User",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserResponse"
+              }
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2021-01-01T00:00:00.000Z",
+            "description": "Created At"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2021-01-01T00:00:00.000Z",
+            "description": "Updated At"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "link",
+          "technologies",
+          "imageUrl",
+          "userResponse",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ProjectUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ValidUUIDv4",
+            "description": "Project ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "Updated Project Name",
+            "description": "Project Name (optional)"
+          },
+          "description": {
+            "type": "string",
+            "example": "Updated Project Description",
+            "description": "Project Description (optional)"
+          },
+          "link": {
+            "type": "string",
+            "example": "https://updated-project-link.com",
+            "description": "Project Link (optional)"
+          },
+          "technologies": {
+            "type": "array",
+            "example": [
+              "tech1",
+              "tech2"
+            ],
+            "description": "Array of technologies (optional)",
+            "items": {
+              "type": "string"
+            }
+          },
+          "image": {
+            "type": "string",
+            "example": "image.jpg",
+            "description": "Project Image (optional)",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    }
+  }
+}

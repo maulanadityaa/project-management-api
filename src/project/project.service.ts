@@ -405,7 +405,7 @@ export class ProjectService {
     };
   }
 
-  async delete(token: string, id: string): Promise<Boolean> {
+  async delete(token: string, id: string): Promise<ProjectResponse> {
     this.logger.debug(`Deleting project ${id}`);
 
     const { userId } = await this.jwtService.verifyToken(token);
@@ -424,7 +424,7 @@ export class ProjectService {
       throw new HttpException('Unauthorized', 401);
     }
 
-    await this.prismaService.project.update({
+    const deletedProject = await this.prismaService.project.update({
       where: {
         id: id,
       },
@@ -434,7 +434,7 @@ export class ProjectService {
       },
     });
 
-    return true;
+    return await this.toProjectResponse(deletedProject);
   }
 
   async reactivate(token: string, id: string): Promise<ProjectResponse> {

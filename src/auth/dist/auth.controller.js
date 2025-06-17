@@ -50,7 +50,6 @@ var common_1 = require("@nestjs/common");
 var auth_model_1 = require("../model/auth.model");
 var auth_decorator_1 = require("../common/auth.decorator");
 var swagger_1 = require("@nestjs/swagger");
-var zod_1 = require("zod");
 var AuthController = /** @class */ (function () {
     function AuthController(authService) {
         this.authService = authService;
@@ -353,7 +352,7 @@ var AuthController = /** @class */ (function () {
         swagger_1.ApiResponse({
             status: common_1.HttpStatus.OK,
             description: 'Token confirmed for password reset',
-            type: zod_1.boolean
+            type: Boolean
         }),
         swagger_1.ApiBody({ type: auth_model_1.PasswordResetRequest }),
         swagger_1.ApiBearerAuth(),

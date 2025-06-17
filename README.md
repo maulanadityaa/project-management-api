@@ -1,80 +1,54 @@
-# Project Management API 🎯
+<h1 align="center">Project Management API 🎯</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/TypeScript-blue?style=flat-square" alt="TypeScript Badge" />
-  <img src="https://img.shields.io/badge/Node.js-green?style=flat-square&logo=node.js&logoColor=white" alt="Node.js Badge" />
-  <img src="https://img.shields.io/badge/NestJS-red?style=flat-square&logo=nestjs&logoColor=white" alt="NestJS Badge" />
-  <img src="https://img.shields.io/badge/Prisma-blueviolet?style=flat-square&logo=prisma&logoColor=white" alt="Prisma Badge" />
-  <!-- <img src="https://img.shields.io/badge/Supabase-brightgreen?style=flat-square&logo=supabase&logoColor=white" alt="Supabase Badge" /> -->
+  <img src="https://img.shields.io/badge/TypeScript-blue?style=flat-square" />
+  <img src="https://img.shields.io/badge/NestJS-red?style=flat-square&logo=nestjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/Prisma-blueviolet?style=flat-square&logo=prisma&logoColor=white" />
+  <img src="https://img.shields.io/badge/Zod-3.23.8-yellow?style=flat-square" />
 </p>
 
-A robust and scalable RESTful API built using **TypeScript**, **Node.js**, and **NestJS** for managing projects, tasks, and user roles. Designed with modern best practices, this API provides a flexible backend foundation for project management applications.
+<p align="center">
+  A secure and production-ready RESTful API built with <b>NestJS</b>, <b>Prisma</b>, and <b>TypeScript</b>. This project handles project portfolios, user authentication with email confirmation, password recovery, and technology tagging—complete with Cloudinary for image uploads and Swagger documentation.
+</p>
 
 ---
 
-## 📚 Table of Contents
+## ✨ Features
 
-- [Project Management API 🎯](#project-management-api-)
-  - [📚 Table of Contents](#-table-of-contents)
-  - [✨ Key Features](#-key-features)
-  - [🛠️ Tech Stack](#️-tech-stack)
-  - [🚀 Getting Started](#-getting-started)
-  - [⚙️ Environment Variables](#️-environment-variables)
-  - [📦 API Endpoints](#-api-endpoints)
-  - [📨 Sample Requests \& Responses](#-sample-requests--responses)
-    - [✅ Register](#-register)
-    - [🔐 Login](#-login)
-    - [📁 Create Project](#-create-project)
-  - [🤝 Contribution Guide](#-contribution-guide)
-
----
-
-## ✨ Key Features
-
-- 🔐 **Authentication & Authorization**  
-  Secure endpoints using JWT. Only authorized users can access protected resources.
-
-- 🗂️ **Task Management**  
-  Create, assign, and track tasks with status and priority control.
-
-- 💾 **Database Integration with Prisma**  
-  Leverage Prisma for database access and type-safe queries.
-
-- 📚 **API Documentation**  
-  Full Swagger documentation available at:  
-  👉 **[Live Swagger Docs](https://project-management-api-cyan.vercel.app/api/v1/docs)**
+- ✅ JWT Authentication & Refresh Tokens
+- ✉️ Email Confirmation (via Mailer & Pug Templates)
+- 🔑 Forgot / Reset Password with Token Verification
+- 📁 Project CRUD with image upload (Cloudinary)
+- 🏷️ Technology tagging with reusable endpoints
+- 📦 Swagger/OpenAPI 3.0 compliant docs
+- 🎯 Built with Zod, Winston logger, Axios, and more
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Tech       | Description                         |
-| ---------- | ----------------------------------- |
-| TypeScript | Typed superset of JavaScript        |
-| NestJS     | Scalable Node.js framework          |
-| Prisma     | Next-gen ORM for TypeScript/Node.js |
-| Supabase   | Optional DB                         |
-| PostgreSQL | Primary database                    |
-| Swagger    | API documentation                   |
+| Tech       | Role                |
+| ---------- | ------------------- |
+| NestJS     | Server Framework    |
+| TypeScript | Language            |
+| Prisma     | ORM for PostgreSQL  |
+| PostgreSQL | Relational Database |
+| Zod        | Schema Validation   |
+| Cloudinary | Image Uploads       |
+| Nodemailer | Email Service       |
+| Pug        | Email Templating    |
+| Winston    | Logging             |
+| Swagger UI | API Documentation   |
 
 ---
 
 ## 🚀 Getting Started
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/maulanadityaa/project-management-api
-
-# 2. Enter the project directory
 cd project-management-api
-
-# 3. Install dependencies
 npm install
-
-# 4. Copy the example environment file
 cp .env.example .env
-
-# 5. Run the app in development mode
 npm run start:dev
 ```
 
@@ -82,141 +56,163 @@ npm run start:dev
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file in the root directory with the following structure:
-
 ```env
-# Application
-PORT=3000
+# App
+PORT=3030
 NODE_ENV=development
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=1d
 
-# Database (PostgreSQL)
-DATABASE_URL=postgresql://user:password@localhost:5432/project_management_db
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/yourdb
 
-# Supabase
-SUPABASE_URL=https://your-supabase-url.supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+# Supabase (optional)
+SUPABASE_URL=https://your-supabase.supabase.co
+SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+
+# Cloudinary
+CLOUDINARY_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_secret
+
+# Mailer
+MAIL_USER=your_email@example.com
+MAIL_PASS=your_password
+MAIL_FROM_NAME=Project API
+MAIL_FROM_EMAIL=your_email@example.com
 
 # Swagger
 SWAGGER_API_TITLE=Project Management API
-SWAGGER_API_DESCRIPTION=REST API documentation for managing projects and tasks
+SWAGGER_API_DESCRIPTION=API for managing projects
 SWAGGER_API_VERSION=1.0
 ```
 
-Update values as needed to match your local or production environment.
+---
+
+## 📦 API Overview (Examples)
+
+### 🔐 Auth Routes
+
+| Method | Endpoint                                    | Description                  |
+| ------ | ------------------------------------------- | ---------------------------- |
+| POST   | `/api/v1/auth/register`                     | Register a user              |
+| POST   | `/api/v1/auth/login`                        | Login user                   |
+| POST   | `/api/v1/auth/refresh-token`                | Refresh JWT token            |
+| GET    | `/api/v1/auth/me`                           | Get current user             |
+| GET    | `/api/v1/auth/confirm`                      | Confirm email registration   |
+| POST   | `/api/v1/auth/send-confirmation-email`      | Resend email confirmation    |
+| POST   | `/api/v1/auth/forgot-password`              | Request password reset email |
+| POST   | `/api/v1/auth/confirm-token-reset-password` | Confirm reset token          |
+| PUT    | `/api/v1/auth/update`                       | Update user profile/password |
+
+### 📁 Project Routes
+
+| Method | Endpoint                           | Description          |
+| ------ | ---------------------------------- | -------------------- |
+| POST   | `/api/v1/projects`                 | Create new project   |
+| GET    | `/api/v1/projects`                 | List all projects    |
+| GET    | `/api/v1/projects/search-per-user` | List user's projects |
+| PUT    | `/api/v1/projects`                 | Update project       |
+| DELETE | `/api/v1/projects/{id}`            | Soft delete project  |
+| PATCH  | `/api/v1/projects/{id}/reactivate` | Reactivate project   |
+
+### 🧪 Technology Routes
+
+| Method | Endpoint                               | Description           |
+| ------ | -------------------------------------- | --------------------- |
+| POST   | `/api/v1/technologies`                 | Add a technology      |
+| PUT    | `/api/v1/technologies`                 | Update a technology   |
+| GET    | `/api/v1/technologies`                 | List all technologies |
+| GET    | `/api/v1/technologies/{techId}`        | Get tech by ID        |
+| GET    | `/api/v1/technologies/name/{techName}` | Get tech by name      |
+| DELETE | `/api/v1/technologies/{techId}`        | Delete technology     |
 
 ---
 
-## 📦 API Endpoints
+## 🔍 Example
 
-| Method | Endpoint                   | Description          |
-| ------ | -------------------------- | -------------------- |
-| POST   | `/api/v1/auth/login`       | Login user           |
-| POST   | `/api/v1/auth/register`    | Register new user    |
-| GET    | `/api/v1/projects`         | List all projects    |
-| POST   | `/api/v1/projects`         | Create a new project |
-| GET    | `/api/v1/projects/:id`     | Get project details  |
-| PUT    | `/api/v1/projects/:id`     | Update project       |
-| DELETE | `/api/v1/projects/:id`     | Delete project       |
-| GET    | `/api/v1/tasks`            | List tasks           |
-| POST   | `/api/v1/tasks`            | Create task          |
-| PUT    | `/api/v1/tasks/:id/status` | Update task status   |
-
----
-
-## 📨 Sample Requests & Responses
-
-### ✅ Register
+### 🔐 Register
 
 ```http
 POST /api/v1/auth/register
 Content-Type: application/json
 
 {
-  "email": "johndoe@example.com",
-  "password": "secure123"
+  "username": "testuser",
+  "email": "test@example.com",
+  "name": "Test User",
+  "password": "strongpass123"
 }
 ```
 
-**Response:**
+**Response**
 
 ```json
 {
-  "message": "User registered successfully",
-  "user": {
-    "id": "uuid",
-    "email": "johndoe@example.com"
-  }
+  "token": "jwt.token.here",
+  "isEmailSent": true
 }
 ```
-
----
-
-### 🔐 Login
-
-```http
-POST /auth/login
-Content-Type: application/json
-
-{
-  "email": "johndoe@example.com",
-  "password": "secure123"
-}
-```
-
-**Response:**
-
-```json
-{
-  "token": "jwt.token.here"
-}
-```
-
----
 
 ### 📁 Create Project
 
 ```http
-POST /projects
+POST /api/v1/projects
 Authorization: Bearer jwt.token.here
-Content-Type: application/json
+Content-Type: multipart/form-data
 
-{
-  "name": "New Feature Development",
-  "description": "Work on new payment integration feature"
-}
+Form Data:
+  name: Team Dashboard
+  description: A real-time dashboard for tracking team productivity
+  link: https://team-dashboard.io
+  technologies: ["React", "Node.js", "PostgreSQL"]
+  image: (upload image file, e.g. dashboard.png)
 ```
 
-**Response:**
+**Response**
 
 ```json
 {
-  "id": "project-uuid",
-  "name": "New Feature Development",
-  "description": "Work on new payment integration feature",
-  "createdAt": "2025-06-11T12:00:00.000Z"
+  "id": "f5f2e998-8b9c-4a30-9a70-2bc30d38a7e7",
+  "name": "Team Dashboard",
+  "description": "A real-time dashboard for tracking team productivity",
+  "link": "https://team-dashboard.io",
+  "technologies": ["React", "Node.js", "PostgreSQL"],
+  "imageUrl": "https://res.cloudinary.com/your-cloud/image/upload/v123456/dashboard.png",
+  "userResponse": {
+    "uid": "user-id",
+    "username": "johndoe",
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "createdAt": "2025-06-17T09:00:00.000Z",
+  "updatedAt": "2025-06-17T09:00:00.000Z"
 }
 ```
 
 ---
 
-## 🤝 Contribution Guide
+## 🌐 Swagger Documentation
 
-1. **Fork** the repo
-2. **Create a new branch**
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. **Commit your changes**
-   ```bash
-   git commit -m 'Add feature'
-   ```
-4. **Push your branch**
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. **Submit a Pull Request**
+Docs available at:  
+📄 [`/api/v1/docs`](https://project-management-api-cyan.vercel.app/api/v1/docs)
 
-We welcome contributions! Please ensure your code adheres to the project's coding standards and includes tests where applicable.
+---
+
+## 🤝 Contributing
+
+```bash
+git checkout -b feature/your-feature
+git commit -m "Add feature"
+git push origin feature/your-feature
+```
+
+Then open a PR 🚀
+
+---
+
+## 📧 Contact
+
+**Author:** [maulanadityaa](https://github.com/maulanadityaa)  
+**Email:** maulanadityaaa@gmail.com

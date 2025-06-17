@@ -4,19 +4,23 @@ import process from 'node:process';
 
 @Injectable()
 export class SwaggerService {
-  setupSwagger(app: INestApplication){
+  setupSwagger(app: INestApplication) {
     const config = new DocumentBuilder()
       .setTitle(process.env.APP_NAME)
       .setDescription(process.env.APP_DESCRIPTION)
       .setVersion(process.env.APP_VERSION)
-      .setContact(process.env.APP_AUTHOR_NAME, process.env.APP_AUTHOR_URL, process.env.APP_AUTHOR_EMAIL)
+      .setContact(
+        process.env.APP_AUTHOR_NAME,
+        process.env.APP_AUTHOR_URL,
+        process.env.APP_AUTHOR_EMAIL,
+      )
       .addBearerAuth()
       .addServer(process.env.APP_LOCAL_URL)
       .addServer(process.env.APP_PROD_URL)
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api/v1/docs', app, document, {
+    SwaggerModule.setup('/docs', app, document, {
       swaggerOptions: {
         persistAuthorization: true,
       },

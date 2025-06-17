@@ -516,7 +516,7 @@ var ProjectService = /** @class */ (function () {
     };
     ProjectService.prototype["delete"] = function (token, id) {
         return __awaiter(this, void 0, Promise, function () {
-            var userId, user, project;
+            var userId, user, project, deletedProject;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -550,8 +550,9 @@ var ProjectService = /** @class */ (function () {
                                 }
                             })];
                     case 4:
-                        _a.sent();
-                        return [2 /*return*/, true];
+                        deletedProject = _a.sent();
+                        return [4 /*yield*/, this.toProjectResponse(deletedProject)];
+                    case 5: return [2 /*return*/, _a.sent()];
                 }
             });
         });

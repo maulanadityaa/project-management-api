@@ -230,13 +230,13 @@ export class ProjectController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Project delete',
-    type: Boolean,
+    type: ProjectResponse,
   })
   @ApiBearerAuth()
   async delete(
     @Auth() token: string,
     @Param('projectId') projectId: string,
-  ): Promise<CommonResponse<Boolean>> {
+  ): Promise<CommonResponse<ProjectResponse>> {
     const result = await this.projectService.delete(token, projectId);
 
     return {
